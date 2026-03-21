@@ -3,7 +3,7 @@ CREATE TYPE employment_type AS ENUM ('FULL_TIME', 'CONTRACT', 'PART_TIME');
 CREATE TABLE employees (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
     department VARCHAR(100) NOT NULL,
     team VARCHAR(100),

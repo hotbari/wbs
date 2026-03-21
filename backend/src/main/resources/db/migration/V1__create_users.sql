@@ -7,5 +7,5 @@ CREATE TABLE users (
     role user_role NOT NULL,
     employee_id UUID NOT NULL UNIQUE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
