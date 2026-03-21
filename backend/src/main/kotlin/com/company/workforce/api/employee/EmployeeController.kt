@@ -1,10 +1,14 @@
 package com.company.workforce.api.employee
 
+import com.company.workforce.api.allocation.AllocationService
+import com.company.workforce.api.allocation.dto.AllocationResponse
+import com.company.workforce.api.common.ForbiddenException
 import com.company.workforce.api.common.UnauthorizedException
 import com.company.workforce.api.employee.dto.CreateEmployeeRequest
 import com.company.workforce.api.employee.dto.UpdateEmployeeRequest
 import com.company.workforce.domain.employee.EmploymentType
 import com.company.workforce.domain.user.UserRepository
+import com.company.workforce.domain.user.UserRole
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.format.annotation.DateTimeFormat
@@ -20,7 +24,8 @@ import java.util.UUID
 @RequestMapping("/api/employees")
 class EmployeeController(
     private val employeeService: EmployeeService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val allocationService: AllocationService
 ) {
 
     @GetMapping
@@ -65,4 +70,17 @@ class EmployeeController(
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deactivate(@PathVariable id: UUID) = employeeService.deactivate(id)
+
+    @GetMapping("/{id}/allocations")
+    @PreAuthorize("isAuthenticated()")
+    fun listAllocations(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal ud: UserDetails
+    ): List<AllocationResponse> {
+        val caller = userRepository.findByEmail(ud.username)
+            ?: throw UnauthorizedException("User not found")
+        if (caller.role != UserRole.ADMIN && caller.employeeId != id)
+            throw ForbiddenException("Cannot view another employee's allocations")
+        return allocationService.listForEmployee(id)
+    }
 }
