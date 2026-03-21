@@ -4,6 +4,7 @@ spring:
     username: ${DB_USER:workforce}
     password: ${DB_PASS:workforce}
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
