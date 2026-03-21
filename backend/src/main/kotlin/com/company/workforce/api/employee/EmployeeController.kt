@@ -1,0 +1,65 @@
+package com.company.workforce.api.employee
+
+import com.company.workforce.api.employee.dto.CreateEmployeeRequest
+import com.company.workforce.api.employee.dto.UpdateEmployeeRequest
+import com.company.workforce.domain.employee.EmploymentType
+import com.company.workforce.domain.user.UserRepository
+import jakarta.validation.Valid
+import org.springframework.data.domain.PageRequest
+import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
+import java.util.UUID
+
+@RestController
+@RequestMapping("/api/employees")
+class EmployeeController(
+    private val employeeService: EmployeeService,
+    private val userRepository: UserRepository
+) {
+
+    @GetMapping
+    fun list(
+        @RequestParam search: String?,
+        @RequestParam department: String?,
+        @RequestParam employmentType: EmploymentType?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "20") pageSize: Int
+    ) = employeeService.list(search, department, employmentType, PageRequest.of(page - 1, pageSize))
+
+    @GetMapping("/available")
+    fun available(
+        @RequestParam minAvailablePercent: Int,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) fromDate: LocalDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) toDate: LocalDate,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "20") pageSize: Int
+    ) = employeeService.listAvailable(minAvailablePercent, fromDate, toDate, PageRequest.of(page - 1, pageSize))
+
+    @GetMapping("/{id}")
+    fun getOne(@PathVariable id: UUID) = employeeService.getDetail(id)
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun create(@Valid @RequestBody request: CreateEmployeeRequest) = employeeService.create(request)
+
+    @PatchMapping("/{id}")
+    fun update(
+        @PathVariable id: UUID,
+        @RequestBody request: UpdateEmployeeRequest,
+        @AuthenticationPrincipal userDetails: UserDetails
+    ): com.company.workforce.api.employee.dto.EmployeeDetail {
+        val caller = userRepository.findByEmail(userDetails.username)!!
+        return employeeService.update(id, request, caller)
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deactivate(@PathVariable id: UUID) = employeeService.deactivate(id)
+}
