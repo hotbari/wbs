@@ -1,6 +1,8 @@
 package com.company.workforce.domain.user
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.Instant
 import java.util.UUID
 
@@ -11,6 +13,7 @@ class User(
     var email: String,
     var passwordHash: String,
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
     var role: UserRole,
     var employeeId: UUID,
     var isActive: Boolean = true,

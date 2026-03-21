@@ -12,6 +12,9 @@ group = "com.company"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
+// Override Spring Boot's managed Testcontainers version to support Docker Desktop 29+
+extra["testcontainers.version"] = "1.21.3"
+
 repositories { mavenCentral() }
 
 dependencies {
@@ -32,7 +35,11 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
 }
 
+
 tasks.withType<KotlinCompile> {
     kotlinOptions { freeCompilerArgs = listOf("-Xjsr305=strict"); jvmTarget = "17" }
 }
-tasks.withType<Test> { useJUnitPlatform() }
+tasks.withType<Test> {
+    useJUnitPlatform()
+    environment("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "/var/run/docker.sock")
+}
