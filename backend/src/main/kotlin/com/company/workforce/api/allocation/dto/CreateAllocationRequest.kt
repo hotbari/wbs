@@ -9,6 +9,7 @@ import java.util.UUID
 data class CreateAllocationRequest(
     val employeeId: UUID,
     @field:NotBlank val projectName: String,
+    val projectId: UUID? = null,
     @field:NotBlank val roleInProject: String,
     @field:Min(1) @field:Max(100) val allocationPercent: Int,
     val startDate: LocalDate,

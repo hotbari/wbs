@@ -7,6 +7,7 @@ data class AllocationResponse(
     val id: UUID,
     val employeeId: UUID,
     val projectName: String,
+    val projectId: UUID?,
     val roleInProject: String,
     val allocationPercent: Int,
     val startDate: LocalDate,

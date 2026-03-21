@@ -9,6 +9,7 @@ import com.company.workforce.api.common.PageResponse
 import com.company.workforce.domain.allocation.ProjectAssignment
 import com.company.workforce.domain.allocation.ProjectAssignmentRepository
 import com.company.workforce.domain.employee.EmployeeRepository
+import com.company.workforce.domain.project.ProjectRepository
 import org.springframework.dao.CannotSerializeTransactionException
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -19,13 +20,17 @@ import java.util.UUID
 @Service
 class AllocationService(
     private val assignmentRepository: ProjectAssignmentRepository,
-    private val employeeRepository: EmployeeRepository
+    private val employeeRepository: EmployeeRepository,
+    private val projectRepository: ProjectRepository
 ) {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     fun create(request: CreateAllocationRequest): AllocationResponse {
         try {
             if (!employeeRepository.existsById(request.employeeId))
                 throw NotFoundException("Employee not found")
+            request.projectId?.let { pid ->
+                if (!projectRepository.existsById(pid)) throw NotFoundException("Project not found")
+            }
 
             // Acquire pessimistic write lock on all active assignments to prevent concurrent over-allocation
             assignmentRepository.findActiveForUpdateLock(request.employeeId)
@@ -40,6 +45,7 @@ class AllocationService(
                 ProjectAssignment(
                     employeeId = request.employeeId,
                     projectName = request.projectName,
+                    projectId = request.projectId,
                     roleInProject = request.roleInProject,
                     allocationPercent = request.allocationPercent,
                     startDate = request.startDate,
@@ -103,6 +109,7 @@ class AllocationService(
         id = id,
         employeeId = employeeId,
         projectName = projectName,
+        projectId = projectId,
         roleInProject = roleInProject,
         allocationPercent = allocationPercent,
         startDate = startDate,
