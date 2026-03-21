@@ -10,6 +10,7 @@ class ProjectAssignment(
     @Id val id: UUID = UUID.randomUUID(),
     val employeeId: UUID,
     var projectName: String,
+    var projectId: UUID? = null,
     var roleInProject: String,
     var allocationPercent: Int,
     var startDate: LocalDate,

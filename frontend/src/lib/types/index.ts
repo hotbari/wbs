@@ -68,3 +68,77 @@ export interface DashboardData {
   availableEmployees: EmployeeSummary[]
   topOverAllocated: Array<{ employee: EmployeeSummary; allocationPercent: number }>
 }
+
+export type ProjectStatus = 'ACTIVE' | 'COMPLETED' | 'ARCHIVED'
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE'
+
+export interface ProjectSummary {
+  id: string
+  name: string
+  status: ProjectStatus
+  startDate: string
+  endDate: string | null
+  phaseCount: number
+  taskCount: number
+}
+
+export interface TaskItem {
+  id: string
+  phaseId: string
+  title: string
+  description: string | null
+  assigneeId: string | null
+  status: TaskStatus
+  progressPercent: number
+  dueDate: string | null
+  createdAt: string
+}
+
+export interface PhaseDetail {
+  id: string
+  projectId: string
+  name: string
+  startDate: string
+  endDate: string
+  orderIndex: number
+  tasks: TaskItem[]
+}
+
+export interface ProjectDetail {
+  id: string
+  name: string
+  description: string | null
+  status: ProjectStatus
+  startDate: string
+  endDate: string | null
+  phases: PhaseDetail[]
+}
+
+export interface Comment {
+  id: string
+  taskId: string
+  author: { id: string; fullName: string }
+  body: string
+  createdAt: string
+}
+
+export interface MyTask {
+  id: string
+  title: string
+  status: TaskStatus
+  progressPercent: number
+  dueDate: string | null
+  project: { id: string; name: string }
+  phase: { id: string; name: string }
+}
+
+export interface ProjectHealth {
+  id: string
+  name: string
+  status: ProjectStatus
+  phaseCount: number
+  totalTaskCount: number
+  inProgressTaskCount: number
+  overdueTaskCount: number
+  completionPercent: number
+}
