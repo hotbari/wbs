@@ -38,6 +38,8 @@ class PhaseControllerTest : IntegrationTestBase() {
     @BeforeEach
     fun setup() {
         refreshTokenRepository.deleteAll()
+        phaseRepository.deleteAll()
+        projectRepository.deleteAll()
         userRepository.deleteAll()
         employeeRepository.deleteAll()
 

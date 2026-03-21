@@ -16,4 +16,7 @@ class UserDetailsImpl(
     override fun getPassword(): String = passwordHash
     override fun getUsername(): String = email
     override fun isEnabled(): Boolean = enabled
+    override fun isAccountNonExpired(): Boolean = true
+    override fun isAccountNonLocked(): Boolean = true
+    override fun isCredentialsNonExpired(): Boolean = true
 }

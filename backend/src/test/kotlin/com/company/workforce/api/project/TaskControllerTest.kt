@@ -41,11 +41,14 @@ class TaskControllerTest : IntegrationTestBase() {
     @BeforeEach
     fun setup() {
         refreshTokenRepository.deleteAll()
+        taskRepository.deleteAll()
+        phaseRepository.deleteAll()
+        projectRepository.deleteAll()
         userRepository.deleteAll()
         employeeRepository.deleteAll()
 
         val adminEmp = createEmployee(employeeRepository, email = "admin@test.com")
-        createUser(userRepository, passwordEncoder, adminEmp.id, email = "admin@test.com", role = UserRole.ADMIN)
+        val adminUser = createUser(userRepository, passwordEncoder, adminEmp.id, email = "admin@test.com", role = UserRole.ADMIN)
         adminToken = loginAndGetToken("admin@test.com", "Password1")
 
         val empEmp = createEmployee(employeeRepository, email = "emp@test.com")
@@ -56,7 +59,7 @@ class TaskControllerTest : IntegrationTestBase() {
         val project = projectRepository.save(
             com.company.workforce.domain.project.Project(
                 name = "Test Project", startDate = java.time.LocalDate.of(2026, 4, 1),
-                createdBy = adminEmp.id
+                createdBy = adminUser.id
             )
         )
         val phase = phaseRepository.save(

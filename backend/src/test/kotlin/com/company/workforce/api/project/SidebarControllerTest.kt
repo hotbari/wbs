@@ -38,6 +38,7 @@ class SidebarControllerTest : IntegrationTestBase() {
     @BeforeEach
     fun setup() {
         refreshTokenRepository.deleteAll()
+        projectRepository.deleteAll()
         userRepository.deleteAll()
         employeeRepository.deleteAll()
 

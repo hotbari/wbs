@@ -29,6 +29,7 @@ class CommentControllerTest : IntegrationTestBase() {
     @Autowired lateinit var projectRepository: ProjectRepository
     @Autowired lateinit var phaseRepository: PhaseRepository
     @Autowired lateinit var taskRepository: ProjectTaskRepository
+    @Autowired lateinit var commentRepository: com.company.workforce.domain.project.TaskCommentRepository
     @Autowired lateinit var employeeRepository: EmployeeRepository
     @Autowired lateinit var userRepository: UserRepository
     @Autowired lateinit var passwordEncoder: PasswordEncoder
@@ -42,11 +43,15 @@ class CommentControllerTest : IntegrationTestBase() {
     @BeforeEach
     fun setup() {
         refreshTokenRepository.deleteAll()
+        commentRepository.deleteAll()
+        taskRepository.deleteAll()
+        phaseRepository.deleteAll()
+        projectRepository.deleteAll()
         userRepository.deleteAll()
         employeeRepository.deleteAll()
 
         val adminEmp = createEmployee(employeeRepository, email = "admin@test.com")
-        createUser(userRepository, passwordEncoder, adminEmp.id, email = "admin@test.com", role = UserRole.ADMIN)
+        val adminUser = createUser(userRepository, passwordEncoder, adminEmp.id, email = "admin@test.com", role = UserRole.ADMIN)
         adminToken = loginAndGetToken("admin@test.com", "Password1")
 
         val empEmp = createEmployee(employeeRepository, email = "emp@test.com")
@@ -58,7 +63,7 @@ class CommentControllerTest : IntegrationTestBase() {
         otherToken = loginAndGetToken("other@test.com", "Password1")
 
         val project = projectRepository.save(
-            Project(name = "Project", startDate = java.time.LocalDate.of(2026, 4, 1), createdBy = adminEmp.id)
+            Project(name = "Project", startDate = java.time.LocalDate.of(2026, 4, 1), createdBy = adminUser.id)
         )
         val phase = phaseRepository.save(
             Phase(projectId = project.id, name = "P1",

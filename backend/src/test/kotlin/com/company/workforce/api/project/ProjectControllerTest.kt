@@ -38,9 +38,9 @@ class ProjectControllerTest : IntegrationTestBase() {
     @BeforeEach
     fun setup() {
         refreshTokenRepository.deleteAll()
+        projectRepository.deleteAll()
         userRepository.deleteAll()
         employeeRepository.deleteAll()
-        projectRepository.deleteAll()
 
         val adminEmp = createEmployee(employeeRepository, email = "admin@test.com")
         createUser(userRepository, passwordEncoder, adminEmp.id, email = "admin@test.com", role = UserRole.ADMIN)
