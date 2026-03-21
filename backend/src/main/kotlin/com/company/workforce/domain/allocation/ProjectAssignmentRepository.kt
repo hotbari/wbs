@@ -4,6 +4,7 @@ import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
@@ -19,8 +20,9 @@ interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
           AND pa.startDate <= CURRENT_DATE
           AND (pa.endDate IS NULL OR pa.endDate >= CURRENT_DATE)
     """)
-    fun sumTodayAllocation(employeeId: UUID, excludeId: UUID): Int
+    fun sumTodayAllocation(employeeId: UUID, excludeId: UUID): Long
 
+    @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
         SELECT pa FROM ProjectAssignment pa

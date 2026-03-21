@@ -16,7 +16,6 @@ class Employee(
     var jobTitle: String,
     var grade: String? = null,
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "employment_type")
     var employmentType: EmploymentType,
     var hiredAt: LocalDate,
     var isActive: Boolean = true

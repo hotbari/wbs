@@ -11,7 +11,6 @@ class User(
     var email: String,
     var passwordHash: String,
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "user_role")
     var role: UserRole,
     var employeeId: UUID,
     var isActive: Boolean = true,

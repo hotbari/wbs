@@ -10,7 +10,6 @@ class EmployeeSkill(
     val employeeId: UUID,
     val skillId: UUID,
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "proficiency_level")
     var proficiency: Proficiency,
     var certified: Boolean = false,
     var note: String? = null
