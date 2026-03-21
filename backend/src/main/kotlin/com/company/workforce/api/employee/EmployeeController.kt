@@ -1,5 +1,6 @@
 package com.company.workforce.api.employee
 
+import com.company.workforce.api.common.UnauthorizedException
 import com.company.workforce.api.employee.dto.CreateEmployeeRequest
 import com.company.workforce.api.employee.dto.UpdateEmployeeRequest
 import com.company.workforce.domain.employee.EmploymentType
@@ -49,12 +50,14 @@ class EmployeeController(
     fun create(@Valid @RequestBody request: CreateEmployeeRequest) = employeeService.create(request)
 
     @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     fun update(
         @PathVariable id: UUID,
-        @RequestBody request: UpdateEmployeeRequest,
+        @Valid @RequestBody request: UpdateEmployeeRequest,
         @AuthenticationPrincipal userDetails: UserDetails
     ): com.company.workforce.api.employee.dto.EmployeeDetail {
-        val caller = userRepository.findByEmail(userDetails.username)!!
+        val caller = userRepository.findByEmail(userDetails.username)
+            ?: throw UnauthorizedException("User not found")
         return employeeService.update(id, request, caller)
     }
 

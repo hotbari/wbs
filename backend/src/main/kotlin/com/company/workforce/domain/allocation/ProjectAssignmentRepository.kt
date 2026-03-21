@@ -22,6 +22,16 @@ interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
     """)
     fun sumTodayAllocation(employeeId: UUID, excludeId: UUID): Long
 
+    @Query("""
+        SELECT COALESCE(SUM(pa.allocationPercent), 0)
+        FROM ProjectAssignment pa
+        WHERE pa.employeeId = :employeeId
+          AND pa.isActive = true
+          AND pa.startDate <= CURRENT_DATE
+          AND (pa.endDate IS NULL OR pa.endDate >= CURRENT_DATE)
+    """)
+    fun sumCurrentAllocation(employeeId: UUID): Long
+
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

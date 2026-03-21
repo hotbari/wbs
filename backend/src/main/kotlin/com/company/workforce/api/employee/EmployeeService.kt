@@ -31,6 +31,7 @@ class EmployeeService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
+    @Transactional(readOnly = true)
     fun list(
         search: String?,
         department: String?,
@@ -46,13 +47,14 @@ class EmployeeService(
         )
     }
 
+    @Transactional(readOnly = true)
     fun getDetail(id: UUID): EmployeeDetail =
         employeeRepository.findById(id)
             .orElseThrow { NotFoundException("Employee not found") }
             .toDetail()
 
     fun create(request: CreateEmployeeRequest): EmployeeDetail {
-        if (userRepository.findByEmail(request.email) != null)
+        if (employeeRepository.findByEmail(request.email) != null || userRepository.findByEmail(request.email) != null)
             throw ConflictException("Email already in use")
         val employee = employeeRepository.save(
             Employee(
@@ -85,7 +87,17 @@ class EmployeeService(
             throw ForbiddenException("Cannot edit another employee")
         if (callerUser.role == UserRole.ADMIN) {
             request.fullName?.let { employee.fullName = it }
-            request.email?.let { employee.email = it }
+            request.email?.let { newEmail ->
+                if (newEmail != employee.email) {
+                    if (employeeRepository.findByEmail(newEmail) != null || userRepository.findByEmail(newEmail) != null)
+                        throw ConflictException("Email already in use")
+                    employee.email = newEmail
+                    userRepository.findByEmployeeId(id)?.let { user ->
+                        user.email = newEmail
+                        userRepository.save(user)
+                    }
+                }
+            }
             request.department?.let { employee.department = it }
             request.jobTitle?.let { employee.jobTitle = it }
             request.employmentType?.let { employee.employmentType = it }
@@ -111,6 +123,7 @@ class EmployeeService(
             .forEach { it.isActive = false; assignmentRepository.save(it) }
     }
 
+    @Transactional(readOnly = true)
     fun listAvailable(
         minAvailablePercent: Int,
         fromDate: LocalDate,
@@ -127,7 +140,7 @@ class EmployeeService(
     }
 
     private fun Employee.toSummary(): EmployeeSummary {
-        val total = assignmentRepository.sumTodayAllocation(id, UUID(0L, 0L))
+        val total = assignmentRepository.sumCurrentAllocation(id)
         return EmployeeSummary(id, fullName, email, department, team, jobTitle, employmentType.name, total)
     }
 

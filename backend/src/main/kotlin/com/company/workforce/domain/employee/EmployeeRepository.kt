@@ -10,6 +10,8 @@ import java.util.UUID
 
 interface EmployeeRepository : JpaRepository<Employee, UUID> {
 
+    fun findByEmail(email: String): Employee?
+
     @Query("""
         SELECT e FROM Employee e WHERE e.isActive = true
         AND (:search IS NULL OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
