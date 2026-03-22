@@ -1,8 +1,11 @@
 'use client'
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import AdminGuard from '@/components/guards/AdminGuard'
 import { useProject, useUpdateProject, useCreatePhase, useDeletePhase, useCreateTask } from '@/lib/hooks/useProjects'
+import { Card, CardBody, Input, Button, PageTransition } from '@/components/ui/primitives'
+import { ArrowLeft, Plus, Trash, ListPlus } from '@phosphor-icons/react'
 
 export default function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -20,99 +23,88 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
 
   return (
     <AdminGuard>
-      <div className="max-w-2xl space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Edit: {project.name}</h1>
-          <button
-            onClick={() => update({ status: 'ARCHIVED' }, { onSuccess: () => router.push('/projects') })}
-            className="text-sm text-red-500 hover:underline"
-          >
-            Archive Project
-          </button>
-        </div>
-
-        {/* Phases */}
-        <div>
-          <h2 className="font-medium mb-3">Phases</h2>
-          {project.phases.map(phase => (
-            <div key={phase.id} className="flex items-center justify-between border rounded p-3 mb-2">
-              <div>
-                <p className="font-medium text-sm">{phase.name}</p>
-                <p className="text-xs text-gray-400">{phase.startDate} → {phase.endDate} (order: {phase.orderIndex})</p>
-                <p className="text-xs text-gray-400">{phase.tasks.length} tasks</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setNewTaskPhaseId(phase.id)}
-                  className="text-xs text-blue-500 hover:underline"
-                >
-                  + Task
-                </button>
-                <button
-                  onClick={() => deletePhase(phase.id)}
-                  className="text-xs text-red-400 hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
+      <PageTransition>
+        <div className="max-w-2xl space-y-8">
+          <div>
+            <Link href={`/projects/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+              <ArrowLeft className="h-4 w-4" />Back to project
+            </Link>
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-semibold tracking-tight">Edit: {project.name}</h1>
+              <Button variant="destructive" size="sm"
+                loading={isPending}
+                onClick={() => update({ status: 'ARCHIVED' }, { onSuccess: () => router.push('/projects') })}>
+                Archive Project
+              </Button>
             </div>
-          ))}
+          </div>
 
-          {/* Add task inline */}
-          {newTaskPhaseId && (
-            <div className="border rounded p-3 mb-2 bg-blue-50">
-              <p className="text-xs font-medium mb-2">New task in: {project.phases.find(p => p.id === newTaskPhaseId)?.name}</p>
-              <div className="flex gap-2">
-                <input
-                  value={newTaskTitle}
-                  onChange={e => setNewTaskTitle(e.target.value)}
-                  placeholder="Task title"
-                  className="flex-1 border rounded px-2 py-1 text-sm"
-                />
-                <button
-                  onClick={() => createTask(
-                    { phaseId: newTaskPhaseId, body: { title: newTaskTitle } },
-                    { onSuccess: () => { setNewTaskPhaseId(null); setNewTaskTitle('') } }
-                  )}
-                  className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
-                >
-                  Add
-                </button>
-                <button onClick={() => setNewTaskPhaseId(null)} className="text-sm text-gray-400">Cancel</button>
-              </div>
-            </div>
-          )}
+          <div>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Phases</h2>
+            {project.phases.map(phase => (
+              <Card key={phase.id} className="mb-2">
+                <CardBody className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium text-sm">{phase.name}</p>
+                    <p className="text-xs text-muted-foreground">{phase.startDate} → {phase.endDate} (order: {phase.orderIndex})</p>
+                    <p className="text-xs text-muted-foreground">{phase.tasks.length} tasks</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => setNewTaskPhaseId(phase.id)}>
+                      <ListPlus className="h-3.5 w-3.5" />Task
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => deletePhase(phase.id)}
+                      className="text-destructive hover:text-destructive hover:bg-destructive-light">
+                      <Trash className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
 
-          {/* Add phase form */}
-          <div className="border rounded p-3 bg-gray-50 space-y-2">
-            <p className="text-sm font-medium">Add Phase</p>
-            <div className="grid grid-cols-2 gap-2">
-              <input placeholder="Phase name" value={newPhase.name}
-                onChange={e => setNewPhase(f => ({ ...f, name: e.target.value }))}
-                className="border rounded px-2 py-1 text-sm col-span-2" />
-              <input type="date" value={newPhase.startDate}
-                onChange={e => setNewPhase(f => ({ ...f, startDate: e.target.value }))}
-                className="border rounded px-2 py-1 text-sm" />
-              <input type="date" value={newPhase.endDate}
-                onChange={e => setNewPhase(f => ({ ...f, endDate: e.target.value }))}
-                className="border rounded px-2 py-1 text-sm" />
-              <input type="number" placeholder="Order" value={newPhase.orderIndex}
-                onChange={e => setNewPhase(f => ({ ...f, orderIndex: e.target.value }))}
-                className="border rounded px-2 py-1 text-sm" />
-            </div>
-            <button
-              onClick={() => createPhase(
-                { name: newPhase.name, startDate: newPhase.startDate,
-                  endDate: newPhase.endDate, orderIndex: parseInt(newPhase.orderIndex) },
-                { onSuccess: () => setNewPhase({ name: '', startDate: '', endDate: '', orderIndex: '0' }) }
-              )}
-              className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm"
-            >
-              Add Phase
-            </button>
+            {newTaskPhaseId && (
+              <Card className="mb-2 border-accent/30 bg-accent-light/30">
+                <CardBody className="py-3">
+                  <p className="text-xs font-medium mb-2">New task in: {project.phases.find(p => p.id === newTaskPhaseId)?.name}</p>
+                  <div className="flex gap-2">
+                    <Input value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)}
+                      placeholder="Task title" className="flex-1" />
+                    <Button size="sm" onClick={() => createTask(
+                      { phaseId: newTaskPhaseId, body: { title: newTaskTitle } },
+                      { onSuccess: () => { setNewTaskPhaseId(null); setNewTaskTitle('') } }
+                    )}>Add</Button>
+                    <Button variant="ghost" size="sm" onClick={() => setNewTaskPhaseId(null)}>Cancel</Button>
+                  </div>
+                </CardBody>
+              </Card>
+            )}
+
+            <Card className="bg-muted/50">
+              <CardBody className="space-y-3">
+                <p className="text-sm font-medium">Add Phase</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input placeholder="Phase name" value={newPhase.name}
+                    onChange={e => setNewPhase(f => ({ ...f, name: e.target.value }))}
+                    className="col-span-2" />
+                  <Input type="date" value={newPhase.startDate}
+                    onChange={e => setNewPhase(f => ({ ...f, startDate: e.target.value }))} />
+                  <Input type="date" value={newPhase.endDate}
+                    onChange={e => setNewPhase(f => ({ ...f, endDate: e.target.value }))} />
+                  <Input type="number" placeholder="Order" value={newPhase.orderIndex}
+                    onChange={e => setNewPhase(f => ({ ...f, orderIndex: e.target.value }))} />
+                </div>
+                <Button onClick={() => createPhase(
+                  { name: newPhase.name, startDate: newPhase.startDate,
+                    endDate: newPhase.endDate, orderIndex: parseInt(newPhase.orderIndex) },
+                  { onSuccess: () => setNewPhase({ name: '', startDate: '', endDate: '', orderIndex: '0' }) }
+                )}>
+                  <Plus className="h-4 w-4" />Add Phase
+                </Button>
+              </CardBody>
+            </Card>
           </div>
         </div>
-      </div>
+      </PageTransition>
     </AdminGuard>
   )
 }

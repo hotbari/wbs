@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import { Input, Select, Button } from '@/components/ui/primitives'
+import { WarningCircle } from '@phosphor-icons/react'
 import type { EmployeeDetail } from '@/lib/types'
 
 interface Props {
@@ -40,43 +42,55 @@ export default function EmployeeForm({ initialData, isCreate = false, onSubmit, 
     return serverError?.errors?.find(e => e.field === field)?.message
   }
 
+  function FieldError({ field }: { field: string }) {
+    const msg = fieldError(field)
+    if (!msg) return null
+    return (
+      <p className="flex items-center gap-1 text-destructive text-xs mt-1">
+        <WarningCircle className="h-3 w-3" weight="bold" />{msg}
+      </p>
+    )
+  }
+
+  const fields = [
+    { label: 'Full Name *', name: 'fullName', type: 'text' },
+    { label: 'Email *', name: 'email', type: 'email' },
+    ...(isCreate ? [{ label: 'Password *', name: 'password', type: 'password' }] : []),
+    { label: 'Phone', name: 'phone', type: 'text' },
+    { label: 'Department *', name: 'department', type: 'text' },
+    { label: 'Team', name: 'team', type: 'text' },
+    { label: 'Job Title *', name: 'jobTitle', type: 'text' },
+    { label: 'Grade', name: 'grade', type: 'text' },
+    { label: 'Hired At *', name: 'hiredAt', type: 'date' },
+  ]
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {[
-        { label: 'Full Name *', name: 'fullName', type: 'text' },
-        { label: 'Email *', name: 'email', type: 'email' },
-        ...(isCreate ? [{ label: 'Password *', name: 'password', type: 'password' }] : []),
-        { label: 'Phone', name: 'phone', type: 'text' },
-        { label: 'Department *', name: 'department', type: 'text' },
-        { label: 'Team', name: 'team', type: 'text' },
-        { label: 'Job Title *', name: 'jobTitle', type: 'text' },
-        { label: 'Grade', name: 'grade', type: 'text' },
-        { label: 'Hired At *', name: 'hiredAt', type: 'date' },
-      ].map(({ label, name, type }) => (
-        <div key={name}>
-          <label className="block text-sm font-medium mb-1">{label}</label>
-          <input
-            type={type}
-            value={(form as Record<string, string>)[name]}
-            onChange={set(name)}
-            className="w-full border rounded p-2 text-sm"
-          />
-          {fieldError(name) && <p className="text-red-500 text-xs mt-1">{fieldError(name)}</p>}
-        </div>
-      ))}
+      <div className="grid grid-cols-2 gap-4">
+        {fields.map(({ label, name, type }) => (
+          <div key={name} className={name === 'email' || name === 'fullName' ? 'col-span-2' : ''}>
+            <label className="block text-sm font-medium mb-1.5">{label}</label>
+            <Input
+              type={type}
+              value={(form as Record<string, string>)[name]}
+              onChange={set(name)}
+              error={!!fieldError(name)}
+            />
+            <FieldError field={name} />
+          </div>
+        ))}
+      </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Employment Type *</label>
-        <select value={form.employmentType} onChange={set('employmentType')}
-          className="w-full border rounded p-2 text-sm">
+        <label className="block text-sm font-medium mb-1.5">Employment Type *</label>
+        <Select value={form.employmentType} onChange={set('employmentType')}>
           <option value="FULL_TIME">Full Time</option>
           <option value="CONTRACT">Contract</option>
           <option value="PART_TIME">Part Time</option>
-        </select>
+        </Select>
       </div>
-      <button type="submit" disabled={isPending}
-        className="bg-blue-600 text-white px-4 py-2 rounded text-sm disabled:opacity-50">
-        {isPending ? 'Saving…' : 'Save'}
-      </button>
+      <Button type="submit" loading={isPending}>
+        Save
+      </Button>
     </form>
   )
 }

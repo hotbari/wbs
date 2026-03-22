@@ -1,8 +1,10 @@
 'use client'
+import { useState } from 'react'
 import AdminGuard from '@/components/guards/AdminGuard'
 import { useSkillList, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/lib/hooks/useSkills'
-import { useState } from 'react'
 import type { Skill } from '@/lib/types'
+import { Card, CardBody, Input, Button, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { PencilSimple, Trash, Tag, Plus, WarningCircle } from '@phosphor-icons/react'
 
 export default function AdminSkillsPage() {
   const { data: skills } = useSkillList()
@@ -18,90 +20,103 @@ export default function AdminSkillsPage() {
 
   return (
     <AdminGuard>
-      <div className="space-y-6 max-w-2xl">
-        <h1 className="text-xl font-semibold">Skills</h1>
+      <PageTransition>
+        <div className="space-y-6 max-w-2xl">
+          <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
 
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            create(
-              { name: newName, category: newCategory },
-              { onSuccess: () => { setNewName(''); setNewCategory('') } }
-            )
-          }}
-          className="flex gap-2"
-        >
-          <input placeholder="Skill name" value={newName} onChange={e => setNewName(e.target.value)}
-            className="border rounded p-2 text-sm flex-1" required />
-          <input placeholder="Category" value={newCategory} onChange={e => setNewCategory(e.target.value)}
-            className="border rounded p-2 text-sm w-40" required />
-          <button type="submit" disabled={creating}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm disabled:opacity-50">Add</button>
-        </form>
+          <Card>
+            <CardBody>
+              <form
+                onSubmit={e => {
+                  e.preventDefault()
+                  create(
+                    { name: newName, category: newCategory },
+                    { onSuccess: () => { setNewName(''); setNewCategory('') } }
+                  )
+                }}
+                className="flex gap-2"
+              >
+                <Input placeholder="Skill name" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1" required />
+                <Input placeholder="Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-40" required />
+                <Button type="submit" loading={creating}><Plus className="h-4 w-4" />Add</Button>
+              </form>
+            </CardBody>
+          </Card>
 
-        {deleteMsg && <p className="text-red-500 text-sm">{deleteMsg}</p>}
+          {deleteMsg && (
+            <div className="flex items-center gap-2 text-destructive text-sm bg-destructive-light border border-destructive/20 rounded-[var(--radius-md)] px-3 py-2">
+              <WarningCircle className="h-4 w-4 shrink-0" weight="bold" />{deleteMsg}
+            </div>
+          )}
 
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2 pr-4">Name</th>
-              <th className="py-2 pr-4">Category</th>
-              <th className="py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {skills?.map((skill: Skill) => (
-              <tr key={skill.id} className="border-b">
-                {editingId === skill.id ? (
-                  <>
-                    <td className="py-1 pr-2">
-                      <input value={editForm.name}
-                        onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                        className="border rounded p-1 text-sm w-full" />
-                    </td>
-                    <td className="py-1 pr-2">
-                      <input value={editForm.category}
-                        onChange={e => setEditForm(f => ({ ...f, category: e.target.value }))}
-                        className="border rounded p-1 text-sm w-full" />
-                    </td>
-                    <td className="py-1">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => update(
-                            { id: skill.id, ...editForm },
-                            { onSuccess: () => setEditingId(null) }
-                          )}
-                          className="text-blue-600 text-xs hover:underline">Save</button>
-                        <button onClick={() => setEditingId(null)} className="text-gray-400 text-xs">Cancel</button>
-                      </div>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="py-2 pr-4">{skill.name}</td>
-                    <td className="py-2 pr-4 text-gray-500">{skill.category}</td>
-                    <td className="py-2">
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => {
-                            setEditingId(skill.id)
-                            setEditForm({ name: skill.name, category: skill.category })
-                          }}
-                          className="text-blue-600 text-xs hover:underline">Edit</button>
-                        <button onClick={() => del(skill.id)}
-                          className="text-red-500 text-xs hover:underline">Delete</button>
-                      </div>
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
-            {(!skills || skills.length === 0) && (
-              <tr><td colSpan={3} className="py-4 text-center text-gray-400">No skills yet.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          <Card>
+            <CardBody className="p-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Name</th>
+                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Category</th>
+                    <th className="py-3 px-4"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {skills?.map((skill: Skill) => (
+                    <tr key={skill.id} className="border-b border-border last:border-0">
+                      {editingId === skill.id ? (
+                        <>
+                          <td className="py-2 px-4">
+                            <Input value={editForm.name}
+                              onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
+                          </td>
+                          <td className="py-2 px-4">
+                            <Input value={editForm.category}
+                              onChange={e => setEditForm(f => ({ ...f, category: e.target.value }))} />
+                          </td>
+                          <td className="py-2 px-4">
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={() => update(
+                                { id: skill.id, ...editForm },
+                                { onSuccess: () => setEditingId(null) }
+                              )}>Save</Button>
+                              <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>Cancel</Button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="py-3 px-4">{skill.name}</td>
+                          <td className="py-3 px-4 text-muted-foreground">{skill.category}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="sm" onClick={() => {
+                                setEditingId(skill.id)
+                                setEditForm({ name: skill.name, category: skill.category })
+                              }}>
+                                <PencilSimple className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => del(skill.id)}
+                                className="text-destructive hover:text-destructive hover:bg-destructive-light">
+                                <Trash className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                  {(!skills || skills.length === 0) && (
+                    <tr>
+                      <td colSpan={3}>
+                        <EmptyState icon={Tag} heading="No skills yet" description="Add your first skill above." className="py-8" />
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </CardBody>
+          </Card>
+        </div>
+      </PageTransition>
     </AdminGuard>
   )
 }

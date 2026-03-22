@@ -17,7 +17,7 @@ interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
     @Query("""
         SELECT pa FROM ProjectAssignment pa WHERE
         (:employeeId IS NULL OR pa.employeeId = :employeeId)
-        AND (:projectName IS NULL OR LOWER(pa.projectName) LIKE LOWER(CONCAT('%', :projectName, '%')))
+        AND (:projectName IS NULL OR LOWER(pa.projectName) LIKE LOWER(CONCAT('%', CAST(:projectName AS string), '%')))
         AND (CAST(:isActive AS string) IS NULL OR pa.isActive = :isActive)
     """)
     fun findWithFilters(

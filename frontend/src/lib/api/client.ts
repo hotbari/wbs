@@ -16,12 +16,13 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// On 401, attempt token refresh once
+// On 401/403, attempt token refresh once then redirect to login
 apiClient.interceptors.response.use(
   (r) => r,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+    const status = error.response?.status
+    if ((status === 401 || status === 403) && !original._retry) {
       original._retry = true
       try {
         const { data } = await axios.post(`${BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
@@ -30,7 +31,9 @@ apiClient.interceptors.response.use(
         return apiClient(original)
       } catch {
         localStorage.removeItem('accessToken')
-        window.location.href = '/login'
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
       }
     }
     return Promise.reject(error)
