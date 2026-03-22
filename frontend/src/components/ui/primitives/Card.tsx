@@ -1,0 +1,27 @@
+import { cn } from '@/lib/utils'
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function Card({ className, ...props }: CardProps) {
+  return (
+    <div
+      className={cn(
+        'bg-card rounded-[var(--radius-xl)] border border-border shadow-sm',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+export function CardHeader({ className, ...props }: CardProps) {
+  return <div className={cn('px-5 py-4 border-b border-border', className)} {...props} />
+}
+
+export function CardBody({ className, ...props }: CardProps) {
+  return <div className={cn('px-5 py-4', className)} {...props} />
+}
+
+export function CardFooter({ className, ...props }: CardProps) {
+  return <div className={cn('px-5 py-4 border-t border-border', className)} {...props} />
+}

@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useEmployeeList } from '@/lib/hooks/useEmployees'
+import { Input, Select, Button } from '@/components/ui/primitives'
+import { WarningCircle } from '@phosphor-icons/react'
 import type { Allocation } from '@/lib/types'
 
 interface Props {
@@ -28,54 +30,51 @@ export default function AllocationForm({ initialData, onSubmit, isPending, serve
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {serverError && <p className="text-red-500 text-sm">{serverError}</p>}
+      {serverError && (
+        <p className="flex items-center gap-1.5 text-destructive text-sm">
+          <WarningCircle className="h-4 w-4" weight="bold" />{serverError}
+        </p>
+      )}
       <div>
-        <label className="block text-sm font-medium mb-1">Employee *</label>
-        <select value={form.employeeId}
-          onChange={e => setForm(f => ({ ...f, employeeId: e.target.value }))}
-          className="w-full border rounded p-2 text-sm" required>
+        <label className="block text-sm font-medium mb-1.5">Employee *</label>
+        <Select value={form.employeeId}
+          onChange={e => setForm(f => ({ ...f, employeeId: e.target.value }))} required>
           <option value="">Select employee</option>
           {employees?.data.map(emp => (
             <option key={emp.id} value={emp.id}>
               {emp.fullName} ({emp.totalAllocationPercent}% allocated)
             </option>
           ))}
-        </select>
+        </Select>
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Project Name *</label>
-        <input value={form.projectName}
-          onChange={e => setForm(f => ({ ...f, projectName: e.target.value }))}
-          className="w-full border rounded p-2 text-sm" required />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="col-span-2">
+          <label className="block text-sm font-medium mb-1.5">Project Name *</label>
+          <Input value={form.projectName}
+            onChange={e => setForm(f => ({ ...f, projectName: e.target.value }))} required />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Role *</label>
+          <Input value={form.roleInProject}
+            onChange={e => setForm(f => ({ ...f, roleInProject: e.target.value }))} required />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Allocation % *</label>
+          <Input type="number" min={1} max={100} value={form.allocationPercent}
+            onChange={e => setForm(f => ({ ...f, allocationPercent: +e.target.value }))} required />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Start Date *</label>
+          <Input type="date" value={form.startDate}
+            onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} required />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">End Date</label>
+          <Input type="date" value={form.endDate ?? ''}
+            onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
+        </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Role *</label>
-        <input value={form.roleInProject}
-          onChange={e => setForm(f => ({ ...f, roleInProject: e.target.value }))}
-          className="w-full border rounded p-2 text-sm" required />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Allocation % *</label>
-        <input type="number" min={1} max={100} value={form.allocationPercent}
-          onChange={e => setForm(f => ({ ...f, allocationPercent: +e.target.value }))}
-          className="w-full border rounded p-2 text-sm" required />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Start Date *</label>
-        <input type="date" value={form.startDate}
-          onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-          className="w-full border rounded p-2 text-sm" required />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">End Date (leave blank = ongoing)</label>
-        <input type="date" value={form.endDate ?? ''}
-          onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-          className="w-full border rounded p-2 text-sm" />
-      </div>
-      <button type="submit" disabled={isPending}
-        className="bg-blue-600 text-white px-4 py-2 rounded text-sm disabled:opacity-50">
-        {isPending ? 'Saving…' : 'Save'}
-      </button>
+      <Button type="submit" loading={isPending}>Save</Button>
     </form>
   )
 }

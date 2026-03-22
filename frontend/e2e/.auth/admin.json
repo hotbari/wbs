@@ -1,0 +1,39 @@
+{
+  "cookies": [
+    {
+      "name": "refreshToken",
+      "value": "12dc0382-6ece-4f5a-a4d1-da84e0f13d75",
+      "domain": "localhost",
+      "path": "/api/auth/refresh",
+      "expires": 1774773235.677876,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "logged_in",
+      "value": "true",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsInVzZXJJZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAxMCIsImlhdCI6MTc3NDE2ODQzNSwiZXhwIjoxNzc0MTY5MzM1fQ.vgvmsCXvdQ0dIIs-C3AEAntMNuDheIYYDp0aAlP1C3Y"
+        },
+        {
+          "name": "auth_user",
+          "value": "{\"id\":\"00000000-0000-0000-0000-000000000010\",\"email\":\"admin@test.com\",\"role\":\"ADMIN\",\"employeeId\":\"00000000-0000-0000-0000-000000000001\"}"
+        }
+      ]
+    }
+  ]
+}

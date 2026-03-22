@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { Input, Button } from '@/components/ui/primitives'
+import { UsersThree, WarningCircle } from '@phosphor-icons/react'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -26,21 +28,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow w-80 space-y-4">
-        <h1 className="text-xl font-semibold">Sign In</h1>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <input type="email" placeholder="Email" value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="w-full border rounded p-2 text-sm" required />
-        <input type="password" placeholder="Password" value={password}
-          onChange={e => setPassword(e.target.value)}
-          className="w-full border rounded p-2 text-sm" required />
-        <button type="submit" disabled={loading}
-          className="w-full bg-blue-600 text-white rounded p-2 text-sm disabled:opacity-50">
-          {loading ? 'Signing in…' : 'Sign In'}
-        </button>
-      </form>
+    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh]">
+      <div className="flex items-center justify-center p-8">
+        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+            <p className="text-sm text-muted-foreground mt-1">Enter your credentials to continue</p>
+          </div>
+          {error && (
+            <div className="flex items-center gap-2 text-destructive text-sm bg-destructive-light border border-destructive/20 rounded-[var(--radius-md)] px-3 py-2">
+              <WarningCircle className="h-4 w-4 shrink-0" weight="bold" />{error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Email</label>
+              <Input type="email" placeholder="you@company.com" value={email}
+                onChange={e => setEmail(e.target.value)} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Password</label>
+              <Input type="password" placeholder="••••••••" value={password}
+                onChange={e => setPassword(e.target.value)} required />
+            </div>
+          </div>
+          <Button type="submit" loading={loading} className="w-full">
+            Sign in
+          </Button>
+        </form>
+      </div>
+      <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-accent to-accent-dark p-12">
+        <div className="text-white text-center max-w-md">
+          <UsersThree className="h-16 w-16 mx-auto mb-6 opacity-90" weight="duotone" />
+          <h2 className="text-3xl font-bold mb-3">Workforce Allocation</h2>
+          <p className="text-emerald-100 text-lg">Manage your team's capacity, skills, and project assignments in one place.</p>
+        </div>
+      </div>
     </div>
   )
 }

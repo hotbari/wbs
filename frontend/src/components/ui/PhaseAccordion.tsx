@@ -1,5 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CaretDown, Calendar, ListDashes } from '@phosphor-icons/react'
+import { Badge, EmptyState } from '@/components/ui/primitives'
 import type { PhaseDetail, TaskItem } from '@/lib/types'
 import TaskRow from './TaskRow'
 
@@ -13,32 +16,53 @@ export default function PhaseAccordion({ phase, onTaskClick, adminActions }: Pro
   const [open, setOpen] = useState(true)
   const done = phase.tasks.filter(t => t.status === 'DONE').length
   return (
-    <div className="border rounded-lg overflow-hidden mb-3">
+    <div className="border border-border rounded-[var(--radius-xl)] overflow-hidden mb-3">
       <button
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted hover:bg-zinc-100 text-left transition-colors"
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
       >
         <div className="flex items-center gap-3">
           <span className="font-medium text-sm">{phase.name}</span>
-          <span className="text-xs text-gray-400">{phase.startDate} → {phase.endDate}</span>
-          <span className="text-xs text-gray-500">{done}/{phase.tasks.length} done</span>
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
+            {phase.startDate} → {phase.endDate}
+          </span>
+          <Badge variant={done === phase.tasks.length && phase.tasks.length > 0 ? 'success' : 'default'}>
+            {done}/{phase.tasks.length}
+          </Badge>
         </div>
         <div className="flex items-center gap-2">
           {adminActions}
-          <span className="text-gray-400">{open ? '▲' : '▼'}</span>
+          <motion.span
+            animate={{ rotate: open ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <CaretDown className="h-4 w-4 text-muted-foreground" />
+          </motion.span>
         </div>
       </button>
-      {open && (
-        <div className="divide-y">
-          {phase.tasks.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-gray-400 italic">No tasks yet</p>
-          ) : (
-            phase.tasks.map(task => (
-              <TaskRow key={task.id} task={task} onClick={onTaskClick} />
-            ))
-          )}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="divide-y divide-border">
+              {phase.tasks.length === 0 ? (
+                <EmptyState icon={ListDashes} heading="No tasks yet" className="py-6" />
+              ) : (
+                phase.tasks.map(task => (
+                  <TaskRow key={task.id} task={task} onClick={onTaskClick} />
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -10,7 +10,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar />
-      <main className="container mx-auto p-4">{children}</main>
+      <main className="max-w-[1400px] mx-auto px-6 py-8">{children}</main>
     </QueryClientProvider>
   )
 }
