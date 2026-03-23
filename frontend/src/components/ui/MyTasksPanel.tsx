@@ -4,7 +4,7 @@ import { Skeleton, EmptyState } from '@/components/ui/primitives'
 import { CheckCircle, Circle, CircleHalf } from '@phosphor-icons/react'
 
 interface Props {
-  onTaskClick: (task: { id: string; title: string; status: string; progressPercent: number; dueDate: string | null; phaseId: string }) => void
+  onTaskClick: (task: { id: string; title: string; status: string; dueDate: string | null; phaseId: string }) => void
 }
 
 function TaskRowSkeleton() {
@@ -32,7 +32,7 @@ export default function MyTasksPanel({ onTaskClick }: Props) {
   )
 
   if (!tasks?.length) return (
-    <EmptyState icon={CheckCircle} heading="All caught up" description="No active tasks assigned to you." className="py-8" />
+    <EmptyState icon={CheckCircle} heading="모든 업무 완료" description="배정된 활성 업무가 없습니다." className="py-8" />
   )
 
   const byProject = tasks.reduce<Record<string, typeof tasks>>((acc, t) => {
