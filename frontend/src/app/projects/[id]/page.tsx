@@ -12,6 +12,9 @@ import ProjectMemberPanel from '@/components/ui/ProjectMemberPanel'
 const STATUS_VARIANT: Record<string, 'success' | 'info' | 'default'> = {
   ACTIVE: 'success', COMPLETED: 'info', ARCHIVED: 'default',
 }
+const STATUS_LABEL: Record<string, string> = {
+  ACTIVE: '활성', COMPLETED: '완료', ARCHIVED: '보관',
+}
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -35,7 +38,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
-                <Badge variant={STATUS_VARIANT[project.status]}>{project.status}</Badge>
+                <Badge variant={STATUS_VARIANT[project.status]}>{STATUS_LABEL[project.status] ?? project.status}</Badge>
               </div>
               {project.description && <p className="text-sm text-muted-foreground mt-1">{project.description}</p>}
               <p className="text-xs text-muted-foreground mt-1">{project.startDate}{project.endDate ? ` → ${project.endDate}` : ''}</p>

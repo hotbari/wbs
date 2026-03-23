@@ -91,7 +91,6 @@ export interface TaskItem {
   assigneeId: string | null
   assigneeName: string | null
   status: TaskStatus
-  progressPercent: number
   dueDate: string | null
   createdAt: string
 }

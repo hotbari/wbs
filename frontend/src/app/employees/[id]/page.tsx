@@ -54,7 +54,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               {employee.phone && <div><span className="text-muted-foreground">전화:</span> {employee.phone}</div>}
               <div><span className="text-muted-foreground">팀:</span> {employee.team ?? '—'}</div>
               <div><span className="text-muted-foreground">등급:</span> {employee.grade ?? '—'}</div>
-              <div><span className="text-muted-foreground">유형:</span> {employee.employmentType}</div>
+              <div><span className="text-muted-foreground">유형:</span> {employee.employmentType === 'FULL_TIME' ? '정규직' : employee.employmentType === 'CONTRACT' ? '계약직' : '파트타임'}</div>
               <div><span className="text-muted-foreground">입사일:</span> {employee.hiredAt}</div>
             </div>
           </CardBody>
