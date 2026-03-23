@@ -6,6 +6,7 @@ import AdminGuard from '@/components/guards/AdminGuard'
 import { useProject, useUpdateProject, useCreatePhase, useDeletePhase, useCreateTask } from '@/lib/hooks/useProjects'
 import { Card, CardBody, Input, Button, PageTransition } from '@/components/ui/primitives'
 import { ArrowLeft, Plus, Trash, ListPlus } from '@phosphor-icons/react'
+import MemberAssignmentSection from '@/components/ui/MemberAssignmentSection'
 
 export default function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -27,20 +28,20 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         <div className="max-w-2xl space-y-8">
           <div>
             <Link href={`/projects/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
-              <ArrowLeft className="h-4 w-4" />Back to project
+              <ArrowLeft className="h-4 w-4" />프로젝트로 돌아가기
             </Link>
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-semibold tracking-tight">Edit: {project.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">수정: {project.name}</h1>
               <Button variant="destructive" size="sm"
                 loading={isPending}
                 onClick={() => update({ status: 'ARCHIVED' }, { onSuccess: () => router.push('/projects') })}>
-                Archive Project
+                프로젝트 보관
               </Button>
             </div>
           </div>
 
           <div>
-            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Phases</h2>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">페이즈</h2>
             {project.phases.map(phase => (
               <Card key={phase.id} className="mb-2">
                 <CardBody className="flex items-center justify-between py-3">
@@ -65,15 +66,15 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
             {newTaskPhaseId && (
               <Card className="mb-2 border-accent/30 bg-accent-light/30">
                 <CardBody className="py-3">
-                  <p className="text-xs font-medium mb-2">New task in: {project.phases.find(p => p.id === newTaskPhaseId)?.name}</p>
+                  <p className="text-xs font-medium mb-2">새 업무: {project.phases.find(p => p.id === newTaskPhaseId)?.name}</p>
                   <div className="flex gap-2">
                     <Input value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)}
-                      placeholder="Task title" className="flex-1" />
+                      placeholder="업무 제목" className="flex-1" />
                     <Button size="sm" onClick={() => createTask(
                       { phaseId: newTaskPhaseId, body: { title: newTaskTitle } },
                       { onSuccess: () => { setNewTaskPhaseId(null); setNewTaskTitle('') } }
-                    )}>Add</Button>
-                    <Button variant="ghost" size="sm" onClick={() => setNewTaskPhaseId(null)}>Cancel</Button>
+                    )}>추가</Button>
+                    <Button variant="ghost" size="sm" onClick={() => setNewTaskPhaseId(null)}>취소</Button>
                   </div>
                 </CardBody>
               </Card>
@@ -81,9 +82,9 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
 
             <Card className="bg-muted/50">
               <CardBody className="space-y-3">
-                <p className="text-sm font-medium">Add Phase</p>
+                <p className="text-sm font-medium">페이즈 추가</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Phase name" value={newPhase.name}
+                  <Input placeholder="페이즈 이름" value={newPhase.name}
                     onChange={e => setNewPhase(f => ({ ...f, name: e.target.value }))}
                     className="col-span-2" />
                   <Input type="date" value={newPhase.startDate}
@@ -98,11 +99,13 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
                     endDate: newPhase.endDate, orderIndex: parseInt(newPhase.orderIndex) },
                   { onSuccess: () => setNewPhase({ name: '', startDate: '', endDate: '', orderIndex: '0' }) }
                 )}>
-                  <Plus className="h-4 w-4" />Add Phase
+                  <Plus className="h-4 w-4" />페이즈 추가
                 </Button>
               </CardBody>
             </Card>
           </div>
+
+          <MemberAssignmentSection projectId={id} projectName={project.name} />
         </div>
       </PageTransition>
     </AdminGuard>
