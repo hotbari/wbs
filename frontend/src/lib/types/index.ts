@@ -47,6 +47,7 @@ export interface EmployeeSkill {
 export interface Allocation {
   id: string
   employeeId: string
+  projectId: string | null
   projectName: string
   roleInProject: string
   allocationPercent: number
@@ -88,8 +89,8 @@ export interface TaskItem {
   title: string
   description: string | null
   assigneeId: string | null
+  assigneeName: string | null
   status: TaskStatus
-  progressPercent: number
   dueDate: string | null
   createdAt: string
 }
@@ -126,7 +127,6 @@ export interface MyTask {
   id: string
   title: string
   status: TaskStatus
-  progressPercent: number
   dueDate: string | null
   project: { id: string; name: string }
   phase: { id: string; name: string }

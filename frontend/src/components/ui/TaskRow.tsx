@@ -2,6 +2,7 @@
 import { Badge, ProgressBar } from '@/components/ui/primitives'
 import { Warning } from '@phosphor-icons/react'
 import type { TaskItem } from '@/lib/types'
+import { statusToProgress, statusToLabel } from '@/lib/utils'
 
 const STATUS_VARIANT: Record<string, 'default' | 'info' | 'success'> = {
   TODO: 'default', IN_PROGRESS: 'info', DONE: 'success',
@@ -16,9 +17,9 @@ export default function TaskRow({ task, onClick }: Props) {
       className="flex items-center gap-3 py-2.5 px-3 hover:bg-muted cursor-pointer transition-colors"
       onClick={() => onClick(task)}
     >
-      <Badge variant={STATUS_VARIANT[task.status]}>{task.status.replace('_', ' ')}</Badge>
+      <Badge variant={STATUS_VARIANT[task.status]}>{statusToLabel(task.status)}</Badge>
       <span className="flex-1 text-sm truncate">{task.title}</span>
-      <div className="w-20"><ProgressBar value={task.progressPercent} size="sm" /></div>
+      <div className="w-20"><ProgressBar value={statusToProgress(task.status)} size="sm" /></div>
       {task.dueDate && (
         isOverdue ? (
           <Badge variant="danger" className="gap-1">

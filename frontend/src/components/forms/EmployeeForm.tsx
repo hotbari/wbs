@@ -53,15 +53,15 @@ export default function EmployeeForm({ initialData, isCreate = false, onSubmit, 
   }
 
   const fields = [
-    { label: 'Full Name *', name: 'fullName', type: 'text' },
-    { label: 'Email *', name: 'email', type: 'email' },
-    ...(isCreate ? [{ label: 'Password *', name: 'password', type: 'password' }] : []),
-    { label: 'Phone', name: 'phone', type: 'text' },
-    { label: 'Department *', name: 'department', type: 'text' },
-    { label: 'Team', name: 'team', type: 'text' },
-    { label: 'Job Title *', name: 'jobTitle', type: 'text' },
-    { label: 'Grade', name: 'grade', type: 'text' },
-    { label: 'Hired At *', name: 'hiredAt', type: 'date' },
+    { label: '이름 *', name: 'fullName', type: 'text' },
+    { label: '이메일 *', name: 'email', type: 'email' },
+    ...(isCreate ? [{ label: '비밀번호 *', name: 'password', type: 'password' }] : []),
+    { label: '전화번호', name: 'phone', type: 'text' },
+    { label: '부서 *', name: 'department', type: 'text' },
+    { label: '팀', name: 'team', type: 'text' },
+    { label: '직함 *', name: 'jobTitle', type: 'text' },
+    { label: '등급', name: 'grade', type: 'text' },
+    { label: '입사일 *', name: 'hiredAt', type: 'date' },
   ]
 
   return (
@@ -81,15 +81,15 @@ export default function EmployeeForm({ initialData, isCreate = false, onSubmit, 
         ))}
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1.5">Employment Type *</label>
+        <label className="block text-sm font-medium mb-1.5">고용 형태 *</label>
         <Select value={form.employmentType} onChange={set('employmentType')}>
-          <option value="FULL_TIME">Full Time</option>
-          <option value="CONTRACT">Contract</option>
-          <option value="PART_TIME">Part Time</option>
+          <option value="FULL_TIME">정규직</option>
+          <option value="CONTRACT">계약직</option>
+          <option value="PART_TIME">파트타임</option>
         </Select>
       </div>
       <Button type="submit" loading={isPending}>
-        Save
+        저장
       </Button>
     </form>
   )

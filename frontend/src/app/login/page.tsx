@@ -20,8 +20,8 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { status: number } }
       setError(axiosErr.response?.status === 403
-        ? 'Account is deactivated'
-        : 'Invalid email or password')
+        ? '비활성화된 계정입니다'
+        : '이메일 또는 비밀번호가 올바르지 않습니다')
     } finally {
       setLoading(false)
     }
@@ -32,8 +32,8 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-8">
         <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-            <p className="text-sm text-muted-foreground mt-1">Enter your credentials to continue</p>
+            <h1 className="text-2xl font-semibold tracking-tight">로그인</h1>
+            <p className="text-sm text-muted-foreground mt-1">계정 정보를 입력해 주세요</p>
           </div>
           {error && (
             <div className="flex items-center gap-2 text-destructive text-sm bg-destructive-light border border-destructive/20 rounded-[var(--radius-md)] px-3 py-2">
@@ -42,26 +42,26 @@ export default function LoginPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1.5">Email</label>
+              <label className="block text-sm font-medium mb-1.5">이메일</label>
               <Input type="email" placeholder="you@company.com" value={email}
                 onChange={e => setEmail(e.target.value)} required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Password</label>
+              <label className="block text-sm font-medium mb-1.5">비밀번호</label>
               <Input type="password" placeholder="••••••••" value={password}
                 onChange={e => setPassword(e.target.value)} required />
             </div>
           </div>
           <Button type="submit" loading={loading} className="w-full">
-            Sign in
+            로그인
           </Button>
         </form>
       </div>
       <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-accent to-accent-dark p-12">
         <div className="text-white text-center max-w-md">
           <UsersThree className="h-16 w-16 mx-auto mb-6 opacity-90" weight="duotone" />
-          <h2 className="text-3xl font-bold mb-3">Workforce Allocation</h2>
-          <p className="text-emerald-100 text-lg">Manage your team's capacity, skills, and project assignments in one place.</p>
+          <h2 className="text-3xl font-bold mb-3">인력 배치 관리</h2>
+          <p className="text-emerald-100 text-lg">팀의 역량, 스킬, 프로젝트 배정을 한 곳에서 관리하세요.</p>
         </div>
       </div>
     </div>

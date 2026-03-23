@@ -29,12 +29,17 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 }
 
 export default function NavBar() {
-  const { user, logout, isAdmin } = useAuth()
+  const { user, logout, isAdmin, isHydrated } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { data: myTasks } = useMyTasks()
   const { data: health } = useProjectHealth()
 
-  if (!user) return null
+  if (!user && isHydrated) return null
+  if (!isHydrated) return (
+    <nav className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border">
+      <div className="max-w-[1400px] mx-auto px-6 h-14" />
+    </nav>
+  )
 
   const badgeCount = isAdmin
     ? (health?.filter(h => h.overdueTaskCount > 0).length ?? 0)
@@ -50,13 +55,13 @@ export default function NavBar() {
               Workforce
             </Link>
             <div className="flex items-center gap-4">
-              <NavLink href="/employees">Employees</NavLink>
-              <NavLink href="/projects">Projects</NavLink>
+              <NavLink href="/employees">직원</NavLink>
+              <NavLink href="/projects">프로젝트</NavLink>
               {isAdmin && (
                 <>
-                  <NavLink href="/admin/allocations">Allocations</NavLink>
-                  <NavLink href="/admin/skills">Skills</NavLink>
-                  <NavLink href="/admin/dashboard">Dashboard</NavLink>
+                  <NavLink href="/admin/allocations">할당</NavLink>
+                  <NavLink href="/admin/skills">스킬</NavLink>
+                  <NavLink href="/admin/dashboard">대시보드</NavLink>
                 </>
               )}
             </div>
@@ -67,14 +72,16 @@ export default function NavBar() {
               className="relative flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-[var(--radius-md)] hover:bg-muted"
             >
               <ListChecks className="h-4 w-4" />
-              Tasks
+              업무
               {badgeCount > 0 && (
                 <Badge variant="danger" className="absolute -top-1.5 -right-1.5 h-4 min-w-[16px] px-1 flex items-center justify-center">
                   {badgeCount}
                 </Badge>
               )}
             </button>
-            <Avatar name={user.email} size="sm" />
+            <Link href="/me">
+              <Avatar name={user.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
+            </Link>
             <button
               onClick={logout}
               className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded-[var(--radius-sm)]"

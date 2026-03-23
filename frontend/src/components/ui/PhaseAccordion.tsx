@@ -53,7 +53,7 @@ export default function PhaseAccordion({ phase, onTaskClick, adminActions }: Pro
           >
             <div className="divide-y divide-border">
               {phase.tasks.length === 0 ? (
-                <EmptyState icon={ListDashes} heading="No tasks yet" className="py-6" />
+                <EmptyState icon={ListDashes} heading="업무가 없습니다" className="py-6" />
               ) : (
                 phase.tasks.map(task => (
                   <TaskRow key={task.id} task={task} onClick={onTaskClick} />

@@ -1,6 +1,8 @@
 'use client'
 import { useEmployee } from '@/lib/hooks/useEmployees'
+import { useEmployeeTasks } from '@/lib/hooks/useEmployeeTasks'
 import SkillBadge from '@/components/ui/SkillBadge'
+import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
 import Link from 'next/link'
 import { use } from 'react'
 import type { EmployeeSkill, Allocation, Proficiency } from '@/lib/types'
@@ -19,11 +21,12 @@ function DetailSkeleton() {
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { data: employee, isLoading } = useEmployee(id)
+  const { data: tasks } = useEmployeeTasks(id)
 
   if (isLoading) return <DetailSkeleton />
   if (!employee) return (
     <div className="border border-destructive/30 bg-destructive-light rounded-[var(--radius-lg)] px-4 py-3 text-sm text-destructive">
-      Employee not found.
+      직원을 찾을 수 없습니다.
     </div>
   )
 
@@ -39,20 +42,20 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
           <Link href={`/employees/${employee.id}/edit`}>
-            <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />Edit</Button>
+            <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />수정</Button>
           </Link>
         </div>
 
         <Card>
           <CardBody className="space-y-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Details</h2>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">상세 정보</h2>
             <div className="grid grid-cols-2 gap-y-3 text-sm">
-              <div><span className="text-muted-foreground">Email:</span> {employee.email}</div>
-              {employee.phone && <div><span className="text-muted-foreground">Phone:</span> {employee.phone}</div>}
-              <div><span className="text-muted-foreground">Team:</span> {employee.team ?? '—'}</div>
-              <div><span className="text-muted-foreground">Grade:</span> {employee.grade ?? '—'}</div>
-              <div><span className="text-muted-foreground">Type:</span> {employee.employmentType}</div>
-              <div><span className="text-muted-foreground">Hired:</span> {employee.hiredAt}</div>
+              <div><span className="text-muted-foreground">이메일:</span> {employee.email}</div>
+              {employee.phone && <div><span className="text-muted-foreground">전화:</span> {employee.phone}</div>}
+              <div><span className="text-muted-foreground">팀:</span> {employee.team ?? '—'}</div>
+              <div><span className="text-muted-foreground">등급:</span> {employee.grade ?? '—'}</div>
+              <div><span className="text-muted-foreground">유형:</span> {employee.employmentType === 'FULL_TIME' ? '정규직' : employee.employmentType === 'CONTRACT' ? '계약직' : '파트타임'}</div>
+              <div><span className="text-muted-foreground">입사일:</span> {employee.hiredAt}</div>
             </div>
           </CardBody>
         </Card>
@@ -60,7 +63,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         <Card>
           <CardBody className="space-y-3">
             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Allocation ({employee.totalAllocationPercent}%)
+              할당률 ({employee.totalAllocationPercent}%)
             </h2>
             <ProgressBar value={employee.totalAllocationPercent} />
           </CardBody>
@@ -69,7 +72,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         {employee.skills.length > 0 && (
           <Card>
             <CardBody className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Skills</h2>
+              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">스킬</h2>
               <div className="flex flex-wrap gap-2">
                 {employee.skills.map((es: EmployeeSkill) => (
                   <SkillBadge key={es.id} name={es.skillId} proficiency={es.proficiency as Proficiency} />
@@ -82,7 +85,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         {employee.assignments.length > 0 && (
           <Card>
             <CardBody className="space-y-3">
-              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Assignments</h2>
+              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">프로젝트 배정</h2>
               <div className="space-y-2">
                 {employee.assignments.map((a: Allocation) => (
                   <div key={a.id} className="flex justify-between text-sm border border-border rounded-[var(--radius-lg)] p-3">
@@ -92,7 +95,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                     <div className="text-right">
                       <p className="font-medium">{a.allocationPercent}%</p>
-                      <p className="text-xs text-muted-foreground">{a.startDate} – {a.endDate ?? 'ongoing'}</p>
+                      <p className="text-xs text-muted-foreground">{a.startDate} – {a.endDate ?? '진행 중'}</p>
                     </div>
                   </div>
                 ))}
@@ -100,6 +103,15 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             </CardBody>
           </Card>
         )}
+
+        <Card>
+          <CardBody className="space-y-3">
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              배정 업무 ({tasks?.length ?? 0})
+            </h2>
+            <EmployeeTaskList tasks={tasks ?? []} />
+          </CardBody>
+        </Card>
       </div>
     </PageTransition>
   )
