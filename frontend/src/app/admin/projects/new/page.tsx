@@ -19,30 +19,30 @@ export default function NewProjectPage() {
       <PageTransition>
         <div className="max-w-lg">
           <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />Back to projects
+            <ArrowLeft className="h-4 w-4" />프로젝트 목록으로 돌아가기
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">New Project</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-6">새 프로젝트</h1>
           <Card>
             <CardBody className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1.5">Name *</label>
+                <label className="block text-sm font-medium mb-1.5">프로젝트 이름 *</label>
                 <Input value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Description</label>
+                <label className="block text-sm font-medium mb-1.5">설명</label>
                 <Textarea value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Start Date *</label>
+                  <label className="block text-sm font-medium mb-1.5">시작일 *</label>
                   <Input type="date" value={form.startDate}
                     onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">End Date</label>
+                  <label className="block text-sm font-medium mb-1.5">종료일</label>
                   <Input type="date" value={form.endDate}
                     onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
                 </div>
@@ -61,7 +61,7 @@ export default function NewProjectPage() {
                   { onSuccess: (p) => router.push(`/projects/${p.id}`) }
                 )}
               >
-                Create Project
+                프로젝트 생성
               </Button>
             </CardBody>
           </Card>

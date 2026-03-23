@@ -95,7 +95,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                     <div className="text-right">
                       <p className="font-medium">{a.allocationPercent}%</p>
-                      <p className="text-xs text-muted-foreground">{a.startDate} – {a.endDate ?? 'ongoing'}</p>
+                      <p className="text-xs text-muted-foreground">{a.startDate} – {a.endDate ?? '진행 중'}</p>
                     </div>
                   </div>
                 ))}

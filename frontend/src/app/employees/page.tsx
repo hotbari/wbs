@@ -37,10 +37,10 @@ export default function EmployeesPage() {
   return (
     <PageTransition>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Employees</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">직원 목록</h1>
         {isAdmin && (
           <Link href="/admin/employees/new">
-            <Button><Plus className="h-4 w-4" />Add Employee</Button>
+            <Button><Plus className="h-4 w-4" />직원 추가</Button>
           </Link>
         )}
       </div>
@@ -48,14 +48,14 @@ export default function EmployeesPage() {
         <div className="relative">
           <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name..."
+            placeholder="이름으로 검색..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
             className="pl-9 w-64"
           />
         </div>
         <Input
-          placeholder="Department"
+          placeholder="부서"
           value={department}
           onChange={e => { setDepartment(e.target.value); setPage(1) }}
           className="w-48"
@@ -63,7 +63,7 @@ export default function EmployeesPage() {
       </div>
       {error && (
         <div className="border border-destructive/30 bg-destructive-light rounded-[var(--radius-lg)] px-4 py-3 text-sm text-destructive mb-6">
-          Failed to load employees.
+          직원 목록을 불러오지 못했습니다.
         </div>
       )}
       {isLoading ? (
@@ -71,7 +71,7 @@ export default function EmployeesPage() {
           {Array.from({ length: 8 }).map((_, i) => <EmployeeCardSkeleton key={i} />)}
         </div>
       ) : data?.data.length === 0 ? (
-        <EmptyState icon={Users} heading="No employees found" description="Try adjusting your search or filters." />
+        <EmptyState icon={Users} heading="직원을 찾을 수 없습니다" description="검색어나 필터를 조정해 보세요." />
       ) : (
         <StaggerList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {data?.data.map(emp => (
@@ -81,9 +81,9 @@ export default function EmployeesPage() {
       )}
       {data && totalPages > 1 && (
         <div className="flex items-center gap-2 mt-8 justify-center">
-          <Button variant="ghost" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>Prev</Button>
-          <span className="text-sm text-muted-foreground px-2">Page {page} of {totalPages}</span>
-          <Button variant="ghost" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
+          <Button variant="ghost" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>이전</Button>
+          <span className="text-sm text-muted-foreground px-2">{page} / {totalPages} 페이지</span>
+          <Button variant="ghost" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>다음</Button>
         </div>
       )}
     </PageTransition>

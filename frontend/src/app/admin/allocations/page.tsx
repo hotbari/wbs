@@ -20,9 +20,9 @@ export default function AllocationsPage() {
       <PageTransition>
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Allocations</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">배정 관리</h1>
             <Button onClick={() => setShowForm(s => !s)} variant={showForm ? 'secondary' : 'primary'}>
-              {showForm ? 'Cancel' : <><Plus className="h-4 w-4" />Add Allocation</>}
+              {showForm ? '취소' : <><Plus className="h-4 w-4" />배정 추가</>}
             </Button>
           </div>
           <AnimatePresence>
@@ -52,12 +52,12 @@ export default function AllocationsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Employee</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Project</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Role</th>
+                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">직원</th>
+                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">프로젝트</th>
+                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">역할</th>
                       <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">%</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Start</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">End</th>
+                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">시작일</th>
+                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">종료일</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>
@@ -73,11 +73,11 @@ export default function AllocationsPage() {
                           </Badge>
                         </td>
                         <td className="py-3 px-4">{a.startDate}</td>
-                        <td className="py-3 px-4">{a.endDate ?? 'Ongoing'}</td>
+                        <td className="py-3 px-4">{a.endDate ?? '진행 중'}</td>
                         <td className="py-3 px-4">
                           <Button variant="ghost" size="sm" onClick={() => deactivate(a.id)}
                             className="text-destructive hover:text-destructive hover:bg-destructive-light">
-                            <Prohibit className="h-3.5 w-3.5" />Deactivate
+                            <Prohibit className="h-3.5 w-3.5" />비활성화
                           </Button>
                         </td>
                       </tr>
@@ -85,7 +85,7 @@ export default function AllocationsPage() {
                     {(!data || data.data.length === 0) && (
                       <tr>
                         <td colSpan={7}>
-                          <EmptyState icon={ListDashes} heading="No active allocations" className="py-8" />
+                          <EmptyState icon={ListDashes} heading="활성 배정이 없습니다" className="py-8" />
                         </td>
                       </tr>
                     )}

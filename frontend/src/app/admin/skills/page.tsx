@@ -22,7 +22,7 @@ export default function AdminSkillsPage() {
     <AdminGuard>
       <PageTransition>
         <div className="space-y-6 max-w-2xl">
-          <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">스킬 관리</h1>
 
           <Card>
             <CardBody>
@@ -36,9 +36,9 @@ export default function AdminSkillsPage() {
                 }}
                 className="flex gap-2"
               >
-                <Input placeholder="Skill name" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1" required />
-                <Input placeholder="Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-40" required />
-                <Button type="submit" loading={creating}><Plus className="h-4 w-4" />Add</Button>
+                <Input placeholder="스킬 이름" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1" required />
+                <Input placeholder="카테고리" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-40" required />
+                <Button type="submit" loading={creating}><Plus className="h-4 w-4" />추가</Button>
               </form>
             </CardBody>
           </Card>
@@ -54,8 +54,8 @@ export default function AdminSkillsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Name</th>
-                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">Category</th>
+                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">스킬 이름</th>
+                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">카테고리</th>
                     <th className="py-3 px-4"></th>
                   </tr>
                 </thead>
@@ -77,8 +77,8 @@ export default function AdminSkillsPage() {
                               <Button size="sm" onClick={() => update(
                                 { id: skill.id, ...editForm },
                                 { onSuccess: () => setEditingId(null) }
-                              )}>Save</Button>
-                              <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>Cancel</Button>
+                              )}>저장</Button>
+                              <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>취소</Button>
                             </div>
                           </td>
                         </>
@@ -107,7 +107,7 @@ export default function AdminSkillsPage() {
                   {(!skills || skills.length === 0) && (
                     <tr>
                       <td colSpan={3}>
-                        <EmptyState icon={Tag} heading="No skills yet" description="Add your first skill above." className="py-8" />
+                        <EmptyState icon={Tag} heading="스킬이 없습니다" description="위에서 첫 번째 스킬을 추가하세요." className="py-8" />
                       </td>
                     </tr>
                   )}

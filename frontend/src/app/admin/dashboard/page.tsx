@@ -22,7 +22,7 @@ export default function DashboardPage() {
     <AdminGuard>
       <PageTransition>
         <div className="space-y-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">대시보드</h1>
           {isLoading ? <DashboardSkeleton /> : data ? (
             <>
               <StaggerList className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -30,7 +30,7 @@ export default function DashboardPage() {
                   <Card><CardBody>
                     <div className="flex items-center gap-2 mb-2">
                       <Users className="h-4 w-4 text-accent" weight="duotone" />
-                      <span className="text-sm text-muted-foreground">Active Employees</span>
+                      <span className="text-sm text-muted-foreground">활성 직원</span>
                     </div>
                     <p className="text-3xl font-bold">{data.totalActiveEmployees}</p>
                   </CardBody></Card>
@@ -39,7 +39,7 @@ export default function DashboardPage() {
                   <Card><CardBody>
                     <div className="flex items-center gap-2 mb-2">
                       <ChartBar className="h-4 w-4 text-accent" weight="duotone" />
-                      <span className="text-sm text-muted-foreground">Avg Allocation</span>
+                      <span className="text-sm text-muted-foreground">평균 할당률</span>
                     </div>
                     <p className="text-3xl font-bold mb-2">{Math.round(data.avgAllocationPercent)}%</p>
                     <ProgressBar value={data.avgAllocationPercent} />
@@ -49,7 +49,7 @@ export default function DashboardPage() {
                   <Card><CardBody>
                     <div className="flex items-center gap-2 mb-2">
                       <UserCircle className="h-4 w-4 text-accent" weight="duotone" />
-                      <span className="text-sm text-muted-foreground">Available</span>
+                      <span className="text-sm text-muted-foreground">여유 인력</span>
                     </div>
                     <p className="text-3xl font-bold">{data.availableEmployees.length}</p>
                   </CardBody></Card>
@@ -58,7 +58,7 @@ export default function DashboardPage() {
                   <Card><CardBody>
                     <div className="flex items-center gap-2 mb-2">
                       <TrendUp className="h-4 w-4 text-warning" weight="duotone" />
-                      <span className="text-sm text-muted-foreground">Over-allocated</span>
+                      <span className="text-sm text-muted-foreground">과할당</span>
                     </div>
                     <p className="text-3xl font-bold">{data.topOverAllocated.length}</p>
                   </CardBody></Card>
@@ -67,9 +67,9 @@ export default function DashboardPage() {
 
               <Card>
                 <CardBody>
-                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">Available (next 30 days)</h2>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">여유 인력 (향후 30일)</h2>
                   {data.availableEmployees.length === 0 ? (
-                    <EmptyState icon={Users} heading="No available employees" className="py-6" />
+                    <EmptyState icon={Users} heading="여유 인력이 없습니다" className="py-6" />
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {data.availableEmployees.map(e => <EmployeeCard key={e.id} employee={e} />)}
@@ -80,7 +80,7 @@ export default function DashboardPage() {
 
               <Card>
                 <CardBody>
-                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">Most Allocated</h2>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">고할당 직원</h2>
                   <div className="space-y-2">
                     {data.topOverAllocated.map(({ employee, allocationPercent }) => (
                       <div key={employee.id} className="flex items-center gap-4 border border-border rounded-[var(--radius-lg)] p-3">

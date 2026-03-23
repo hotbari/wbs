@@ -15,9 +15,9 @@ export default function NewEmployeePage() {
       <PageTransition>
         <div className="max-w-xl mx-auto">
           <Link href="/employees" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />Back to employees
+            <ArrowLeft className="h-4 w-4" />직원 목록으로 돌아가기
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">Add Employee</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-6">직원 추가</h1>
           <Card>
             <CardBody>
               <EmployeeForm

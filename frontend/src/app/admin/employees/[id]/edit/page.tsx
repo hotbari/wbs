@@ -25,9 +25,9 @@ export default function AdminEditEmployeePage({ params }: { params: Promise<{ id
       <PageTransition>
         <div className="max-w-xl mx-auto">
           <Link href={`/employees/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />Back to profile
+            <ArrowLeft className="h-4 w-4" />프로필로 돌아가기
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">Edit Employee</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-6">직원 정보 수정</h1>
           <Card>
             <CardBody>
               <EmployeeForm

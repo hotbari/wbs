@@ -11,11 +11,15 @@ const STATUS_VARIANT: Record<string, 'success' | 'info' | 'default'> = {
   ACTIVE: 'success', COMPLETED: 'info', ARCHIVED: 'default',
 }
 
+const STATUS_LABEL: Record<string, string> = {
+  ACTIVE: '진행 중', COMPLETED: '완료', ARCHIVED: '보관됨',
+}
+
 const filters: { label: string; value: ProjectStatus | undefined }[] = [
-  { label: 'All', value: undefined },
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Completed', value: 'COMPLETED' },
-  { label: 'Archived', value: 'ARCHIVED' },
+  { label: '전체', value: undefined },
+  { label: '진행 중', value: 'ACTIVE' },
+  { label: '완료', value: 'COMPLETED' },
+  { label: '보관됨', value: 'ARCHIVED' },
 ]
 
 function ProjectCardSkeleton() {
@@ -29,7 +33,7 @@ export default function ProjectsPage() {
   return (
     <PageTransition>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">프로젝트</h1>
         <div className="flex items-center gap-3">
           <div className="flex bg-muted rounded-[var(--radius-lg)] p-0.5">
             {filters.map(f => (
@@ -45,13 +49,13 @@ export default function ProjectsPage() {
               </button>
             ))}
           </div>
-          <Link href="/admin/projects/new"><Button><Plus className="h-4 w-4" />New Project</Button></Link>
+          <Link href="/admin/projects/new"><Button><Plus className="h-4 w-4" />새 프로젝트</Button></Link>
         </div>
       </div>
       {isLoading ? (
         <div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)}</div>
       ) : !data?.data.length ? (
-        <EmptyState icon={FolderOpen} heading="No projects found" description="Create your first project to get started." />
+        <EmptyState icon={FolderOpen} heading="프로젝트가 없습니다" description="첫 번째 프로젝트를 생성해 보세요." />
       ) : (
         <StaggerList className="grid gap-4">
           {data.data.map(p => (
@@ -61,10 +65,10 @@ export default function ProjectsPage() {
                   <CardBody className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{p.name}</p>
-                      <p className="text-sm text-muted-foreground">{p.phaseCount} phases · {p.taskCount} tasks</p>
+                      <p className="text-sm text-muted-foreground">{p.phaseCount}개 페이즈 · {p.taskCount}개 업무</p>
                       <p className="text-xs text-muted-foreground">{p.startDate}{p.endDate ? ` → ${p.endDate}` : ''}</p>
                     </div>
-                    <Badge variant={STATUS_VARIANT[p.status]}>{p.status}</Badge>
+                    <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status] ?? p.status}</Badge>
                   </CardBody>
                 </Card>
               </Link>

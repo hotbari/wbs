@@ -48,11 +48,11 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
                   <div>
                     <p className="font-medium text-sm">{phase.name}</p>
                     <p className="text-xs text-muted-foreground">{phase.startDate} → {phase.endDate} (order: {phase.orderIndex})</p>
-                    <p className="text-xs text-muted-foreground">{phase.tasks.length} tasks</p>
+                    <p className="text-xs text-muted-foreground">{phase.tasks.length}개 업무</p>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="sm" onClick={() => setNewTaskPhaseId(phase.id)}>
-                      <ListPlus className="h-3.5 w-3.5" />Task
+                      <ListPlus className="h-3.5 w-3.5" />업무 추가
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => deletePhase(phase.id)}
                       className="text-destructive hover:text-destructive hover:bg-destructive-light">
@@ -91,7 +91,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
                     onChange={e => setNewPhase(f => ({ ...f, startDate: e.target.value }))} />
                   <Input type="date" value={newPhase.endDate}
                     onChange={e => setNewPhase(f => ({ ...f, endDate: e.target.value }))} />
-                  <Input type="number" placeholder="Order" value={newPhase.orderIndex}
+                  <Input type="number" placeholder="순서" value={newPhase.orderIndex}
                     onChange={e => setNewPhase(f => ({ ...f, orderIndex: e.target.value }))} />
                 </div>
                 <Button onClick={() => createPhase(
