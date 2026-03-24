@@ -80,7 +80,7 @@ export default function NavBar() {
               )}
             </button>
             <Link href="/me">
-              <Avatar name={user.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
+              <Avatar name={user!.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
             </Link>
             <button
               onClick={logout}
