@@ -2,27 +2,53 @@
 import { useState } from 'react'
 import AdminGuard from '@/components/guards/AdminGuard'
 import { useSkillList, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/lib/hooks/useSkills'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { mergeSkills } from '@/lib/api/skills'
 import type { Skill } from '@/lib/types'
 import { Card, CardBody, Input, Button, EmptyState, PageTransition } from '@/components/ui/primitives'
-import { PencilSimple, Trash, Tag, Plus, WarningCircle } from '@phosphor-icons/react'
+import { PencilSimple, Trash, Tag, Plus, WarningCircle, ArrowsLeftRight } from '@phosphor-icons/react'
 
 export default function AdminSkillsPage() {
   const { data: skills } = useSkillList()
   const { mutate: create, isPending: creating } = useCreateSkill()
   const { mutate: update } = useUpdateSkill()
   const { mutate: del, error: deleteError } = useDeleteSkill()
+  const queryClient = useQueryClient()
+  const { mutate: merge, isPending: merging } = useMutation({
+    mutationFn: ({ sourceId, targetId }: { sourceId: string; targetId: string }) =>
+      mergeSkills(sourceId, targetId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['skills'] })
+      setMergeSourceId(null)
+    },
+  })
+
   const [newName, setNewName] = useState('')
   const [newCategory, setNewCategory] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', category: '' })
+  const [mergeSourceId, setMergeSourceId] = useState<string | null>(null)
 
   const deleteMsg = (deleteError as { response?: { data?: { message?: string } } } | null)?.response?.data?.message
+  const mergeSource = skills?.find((s: Skill) => s.id === mergeSourceId)
 
   return (
     <AdminGuard>
       <PageTransition>
         <div className="space-y-6 max-w-2xl">
           <h1 className="text-2xl font-semibold tracking-tight">스킬 관리</h1>
+
+          {mergeSourceId && (
+            <div className="border border-warning/40 bg-warning/5 rounded-[var(--radius-lg)] px-4 py-3 text-sm">
+              <p className="font-medium text-warning mb-1">병합 모드</p>
+              <p className="text-muted-foreground">
+                <strong>{mergeSource?.name}</strong>을(를) 병합할 대상 스킬을 클릭하세요.
+                해당 스킬에 배정된 직원들이 대상 스킬로 이동됩니다.
+              </p>
+              <Button variant="ghost" size="sm" className="mt-2"
+                onClick={() => setMergeSourceId(null)}>취소</Button>
+            </div>
+          )}
 
           <Card>
             <CardBody>
@@ -61,7 +87,22 @@ export default function AdminSkillsPage() {
                 </thead>
                 <tbody>
                   {skills?.map((skill: Skill) => (
-                    <tr key={skill.id} className="border-b border-border last:border-0">
+                    <tr
+                      key={skill.id}
+                      className={`border-b border-border last:border-0 ${
+                        mergeSourceId && skill.id !== mergeSourceId
+                          ? 'cursor-pointer hover:bg-warning/5'
+                          : ''
+                      } ${mergeSourceId === skill.id ? 'bg-warning/10' : ''}`}
+                      onClick={() => {
+                        if (merging) return
+                        if (mergeSourceId && skill.id !== mergeSourceId) {
+                          if (confirm(`"${mergeSource?.name}"을(를) "${skill.name}"으로 병합하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+                            merge({ sourceId: mergeSourceId, targetId: skill.id })
+                          }
+                        }
+                      }}
+                    >
                       {editingId === skill.id ? (
                         <>
                           <td className="py-2 px-4">
@@ -88,13 +129,27 @@ export default function AdminSkillsPage() {
                           <td className="py-3 px-4 text-muted-foreground">{skill.category}</td>
                           <td className="py-3 px-4">
                             <div className="flex gap-1">
-                              <Button variant="ghost" size="sm" onClick={() => {
-                                setEditingId(skill.id)
-                                setEditForm({ name: skill.name, category: skill.category })
-                              }}>
+                              <Button variant="ghost" size="sm"
+                                disabled={!!mergeSourceId}
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  setEditingId(skill.id)
+                                  setEditForm({ name: skill.name, category: skill.category })
+                                }}>
                                 <PencilSimple className="h-3.5 w-3.5" />
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => del(skill.id)}
+                              <Button variant="ghost" size="sm"
+                                disabled={!!mergeSourceId}
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  setMergeSourceId(skill.id)
+                                }}
+                                title="이 스킬을 다른 스킬로 병합">
+                                <ArrowsLeftRight className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="sm"
+                                disabled={!!mergeSourceId}
+                                onClick={e => { e.stopPropagation(); del(skill.id) }}
                                 className="text-destructive hover:text-destructive hover:bg-destructive-light">
                                 <Trash className="h-3.5 w-3.5" />
                               </Button>

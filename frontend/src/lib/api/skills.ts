@@ -45,3 +45,7 @@ export async function updateEmployeeSkill(
 export async function removeEmployeeSkill(employeeId: string, skillId: string): Promise<void> {
   await apiClient.delete(`/api/employees/${employeeId}/skills/${skillId}`)
 }
+
+export async function mergeSkills(sourceId: string, targetId: string): Promise<void> {
+  await apiClient.post('/api/admin/skills/merge', { sourceId, targetId })
+}
