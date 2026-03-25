@@ -7,11 +7,14 @@ import com.company.workforce.api.common.PageResponse
 import com.company.workforce.api.employee.dto.CreateEmployeeRequest
 import com.company.workforce.api.employee.dto.EmployeeDetail
 import com.company.workforce.api.employee.dto.EmployeeSummary
+import com.company.workforce.api.employee.dto.SkillTag
 import com.company.workforce.api.employee.dto.UpdateEmployeeRequest
 import com.company.workforce.domain.allocation.ProjectAssignmentRepository
 import com.company.workforce.domain.employee.Employee
 import com.company.workforce.domain.employee.EmployeeRepository
 import com.company.workforce.domain.employee.EmploymentType
+import com.company.workforce.domain.skill.EmployeeSkillRepository
+import com.company.workforce.domain.skill.SkillRepository
 import com.company.workforce.domain.user.User
 import com.company.workforce.domain.user.UserRepository
 import com.company.workforce.domain.user.UserRole
@@ -28,6 +31,8 @@ class EmployeeService(
     private val employeeRepository: EmployeeRepository,
     private val userRepository: UserRepository,
     private val assignmentRepository: ProjectAssignmentRepository,
+    private val employeeSkillRepository: EmployeeSkillRepository,
+    private val skillRepository: SkillRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
 
@@ -36,9 +41,11 @@ class EmployeeService(
         search: String?,
         department: String?,
         employmentType: EmploymentType?,
+        skillIds: List<UUID>?,
+        maxAllocationPercent: Int?,
         pageable: Pageable
     ): PageResponse<EmployeeSummary> {
-        val page = employeeRepository.search(search, department, employmentType, pageable)
+        val page = employeeRepository.search(search, department, employmentType, skillIds?.takeIf { it.isNotEmpty() }, maxAllocationPercent, pageable)
         return PageResponse(
             data = page.content.map { it.toSummary() },
             page = pageable.pageNumber + 1,
@@ -141,7 +148,13 @@ class EmployeeService(
 
     private fun Employee.toSummary(): EmployeeSummary {
         val total = assignmentRepository.sumCurrentAllocation(id)
-        return EmployeeSummary(id, fullName, email, department, team, jobTitle, employmentType.name, total)
+        val empSkills = employeeSkillRepository.findByEmployeeId(id).take(3)
+        val skillIds = empSkills.map { it.skillId }.toSet()
+        val skillNameMap = skillRepository.findAllById(skillIds).associate { it.id to it.name }
+        val topSkills = empSkills.map { es ->
+            SkillTag(skillId = es.skillId, name = skillNameMap[es.skillId] ?: "", proficiency = es.proficiency.name)
+        }
+        return EmployeeSummary(id, fullName, email, department, team, jobTitle, employmentType.name, total, topSkills)
     }
 
     private fun Employee.toDetail() = EmployeeDetail(
