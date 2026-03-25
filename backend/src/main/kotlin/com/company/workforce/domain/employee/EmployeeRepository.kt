@@ -13,15 +13,30 @@ interface EmployeeRepository : JpaRepository<Employee, UUID> {
     fun findByEmail(email: String): Employee?
 
     @Query("""
-        SELECT e FROM Employee e WHERE e.isActive = true
+        SELECT DISTINCT e FROM Employee e
+        LEFT JOIN EmployeeSkill es ON es.employeeId = e.id
+        WHERE e.isActive = true
         AND (:search IS NULL OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
         AND (:department IS NULL OR e.department = CAST(:department AS string))
         AND (:#{#employmentType} IS NULL OR e.employmentType = :#{#employmentType})
+        AND (:#{#skillIds} IS NULL OR es.skillId IN :#{#skillIds})
+        AND (
+            :maxAllocationPercent IS NULL OR
+            (SELECT COALESCE(SUM(pa.allocationPercent), 0)
+             FROM ProjectAssignment pa
+             WHERE pa.employeeId = e.id
+               AND pa.isActive = true
+               AND pa.startDate <= CURRENT_DATE
+               AND (pa.endDate IS NULL OR pa.endDate >= CURRENT_DATE)
+            ) <= :maxAllocationPercent
+        )
     """)
     fun search(
         search: String?,
         department: String?,
         @Param("employmentType") employmentType: EmploymentType?,
+        @Param("skillIds") skillIds: List<UUID>?,
+        maxAllocationPercent: Int?,
         pageable: Pageable
     ): Page<Employee>
 
