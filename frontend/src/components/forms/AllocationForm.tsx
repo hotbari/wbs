@@ -62,6 +62,24 @@ export default function AllocationForm({ initialData, onSubmit, isPending, serve
           <label className="block text-sm font-medium mb-1.5">할당률 % *</label>
           <Input type="number" min={1} max={100} value={form.allocationPercent}
             onChange={e => setForm(f => ({ ...f, allocationPercent: +e.target.value }))} required />
+          {form.employeeId && Number.isFinite(form.allocationPercent) && form.allocationPercent > 0 && (() => {
+            const emp = employees?.data.find(e => e.id === form.employeeId)
+            if (!emp) return null
+            const current = initialData
+              ? emp.totalAllocationPercent - (initialData.allocationPercent ?? 0)
+              : emp.totalAllocationPercent
+            const newTotal = current + form.allocationPercent
+            return (
+              <p className={`text-xs mt-1 ${
+                newTotal > 100 ? 'text-destructive font-medium' :
+                newTotal >= 80  ? 'text-warning font-medium' :
+                'text-muted-foreground'
+              }`}>
+                현재 {current}% → 저장 시 {newTotal}%
+                {newTotal > 100 && ' ⚠ 초과'}
+              </p>
+            )
+          })()}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5">시작일 *</label>
