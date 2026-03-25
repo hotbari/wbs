@@ -4,10 +4,13 @@ import { useEmployeeTasks } from '@/lib/hooks/useEmployeeTasks'
 import SkillBadge from '@/components/ui/SkillBadge'
 import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
 import Link from 'next/link'
-import { use } from 'react'
+import { use, useState } from 'react'
 import type { EmployeeSkill, Allocation, Proficiency } from '@/lib/types'
 import { Avatar, Button, Card, CardBody, ProgressBar, Skeleton, SkeletonCircle, SkeletonText, PageTransition } from '@/components/ui/primitives'
-import { PencilSimple } from '@phosphor-icons/react'
+import { PencilSimple, ShareNetwork } from '@phosphor-icons/react'
+import { useAuth } from '@/lib/hooks/useAuth'
+import { useMutation } from '@tanstack/react-query'
+import { createShareLink } from '@/lib/api/share'
 
 function DetailSkeleton() {
   return (
@@ -22,6 +25,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params)
   const { data: employee, isLoading } = useEmployee(id)
   const { data: tasks } = useEmployeeTasks(id)
+  const { isAdmin } = useAuth()
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
+  const { mutate: share, isPending: sharing } = useMutation({
+    mutationFn: () => createShareLink(id),
+    onSuccess: (res) => {
+      navigator.clipboard.writeText(res.url)
+      setCopiedUrl(res.url)
+      setTimeout(() => setCopiedUrl(null), 3000)
+    },
+  })
 
   if (isLoading) return <DetailSkeleton />
   if (!employee) return (
@@ -41,9 +54,17 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <p className="text-muted-foreground">{employee.jobTitle} · {employee.department}</p>
             </div>
           </div>
-          <Link href={`/employees/${employee.id}/edit`}>
-            <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />수정</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href={`/employees/${employee.id}/edit`}>
+              <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />수정</Button>
+            </Link>
+            {isAdmin && (
+              <Button variant="secondary" size="sm" loading={sharing} onClick={() => share()}>
+                <ShareNetwork className="h-4 w-4" />
+                {copiedUrl ? '복사됨!' : '링크 공유'}
+              </Button>
+            )}
+          </div>
         </div>
 
         <Card>

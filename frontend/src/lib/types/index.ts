@@ -149,3 +149,24 @@ export interface ProjectHealth {
   overdueTaskCount: number
   completionPercent: number
 }
+
+export interface ShareLinkResponse {
+  token: string
+  url: string
+  expiresAt: string
+}
+
+export interface SharedAllocationView {
+  fullName: string
+  jobTitle: string
+  department: string
+  totalAllocationPercent: number
+  allocations: Array<{
+    projectName: string
+    roleInProject: string
+    allocationPercent: number
+    startDate: string
+    endDate: string | null
+  }>
+  generatedAt: string
+}
