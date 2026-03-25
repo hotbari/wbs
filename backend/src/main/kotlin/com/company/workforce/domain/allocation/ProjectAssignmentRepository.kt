@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.UUID
 
 interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
@@ -55,4 +56,18 @@ interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
         WHERE pa.employeeId = :employeeId AND pa.isActive = true
     """)
     fun findActiveForUpdateLock(employeeId: UUID): List<ProjectAssignment>
+
+    @Query("""
+        SELECT pa FROM ProjectAssignment pa
+        WHERE pa.employeeId = :employeeId
+          AND pa.isActive = true
+          AND pa.startDate <= :today
+          AND pa.endDate IS NOT NULL
+          AND pa.endDate >= :today
+        ORDER BY pa.endDate ASC
+    """)
+    fun findActiveWithFutureEndDate(
+        @Param("employeeId") employeeId: UUID,
+        @Param("today") today: LocalDate
+    ): List<ProjectAssignment>
 }

@@ -7,6 +7,7 @@ import com.company.workforce.api.common.PageResponse
 import com.company.workforce.api.employee.dto.CreateEmployeeRequest
 import com.company.workforce.api.employee.dto.EmployeeDetail
 import com.company.workforce.api.employee.dto.EmployeeSummary
+import com.company.workforce.api.employee.dto.AvailabilityPeriod
 import com.company.workforce.api.employee.dto.SkillTag
 import com.company.workforce.api.employee.dto.UpdateEmployeeRequest
 import com.company.workforce.domain.allocation.ProjectAssignmentRepository
@@ -146,6 +147,38 @@ class EmployeeService(
             pageSize = pageable.pageSize,
             total = page.totalElements
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun getAvailability(id: UUID): List<AvailabilityPeriod> {
+        employeeRepository.findById(id).orElseThrow { NotFoundException("Employee not found") }
+        val today = LocalDate.now()
+        val currentTotal = assignmentRepository.sumCurrentAllocation(id).toInt()
+        val endingAssignments = assignmentRepository.findActiveWithFutureEndDate(id, today)
+
+        if (endingAssignments.isEmpty()) {
+            return listOf(AvailabilityPeriod(today, null, (100 - currentTotal).coerceAtLeast(0)))
+        }
+
+        // group by end date: sum of allocation freed on that day
+        val freedByDate = endingAssignments
+            .groupBy { it.endDate!! }
+            .mapValues { (_, list) -> list.sumOf { it.allocationPercent } }
+            .toSortedMap()
+
+        val periods = mutableListOf<AvailabilityPeriod>()
+        var allocated = currentTotal
+        var periodStart = today
+
+        for ((endDate, freed) in freedByDate) {
+            periods.add(AvailabilityPeriod(periodStart, endDate, (100 - allocated).coerceAtLeast(0)))
+            periodStart = endDate.plusDays(1)
+            allocated -= freed
+        }
+        // final open-ended period
+        periods.add(AvailabilityPeriod(periodStart, null, (100 - allocated).coerceAtLeast(0)))
+
+        return periods
     }
 
     private fun buildSkillsMap(employeeIds: List<UUID>): Map<UUID, List<SkillTag>> {

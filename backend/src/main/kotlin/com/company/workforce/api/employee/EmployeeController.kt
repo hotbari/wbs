@@ -80,6 +80,9 @@ class EmployeeController(
     fun listTasks(@PathVariable id: UUID): List<MyTaskResponse> =
         sidebarService.getEmployeeTasks(id)
 
+    @GetMapping("/{id}/availability")
+    fun getAvailability(@PathVariable id: UUID) = employeeService.getAvailability(id)
+
     @GetMapping("/{id}/allocations")
     @PreAuthorize("isAuthenticated()")
     fun listAllocations(
