@@ -2,6 +2,8 @@
 import { useState } from 'react'
 import { Input, Select, Button } from '@/components/ui/primitives'
 import { WarningCircle } from '@phosphor-icons/react'
+import { useDeactivateEmployee } from '@/lib/hooks/useEmployees'
+import { useRouter } from 'next/navigation'
 import type { EmployeeDetail } from '@/lib/types'
 
 interface Props {
@@ -25,6 +27,19 @@ export default function EmployeeForm({ initialData, isCreate = false, onSubmit, 
     employmentType: (initialData?.employmentType ?? 'FULL_TIME') as string,
     hiredAt: initialData?.hiredAt ?? '',
   })
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false)
+  const { mutate: deactivate, isPending: isDeactivating } = useDeactivateEmployee()
+  const router = useRouter()
+
+  function handleDeactivate() {
+    if (initialData?.id) {
+      deactivate(initialData.id, {
+        onSuccess: () => {
+          router.push('/employees')
+        },
+      })
+    }
+  }
 
   function set(key: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -91,6 +106,27 @@ export default function EmployeeForm({ initialData, isCreate = false, onSubmit, 
       <Button type="submit" loading={isPending}>
         저장
       </Button>
+      {!isCreate && (
+        <>
+          {!showDeactivateConfirm ? (
+            <Button variant="destructive" onClick={() => setShowDeactivateConfirm(true)}>
+              직원 비활성화
+            </Button>
+          ) : (
+            <div className="border border-destructive/30 bg-destructive/5 rounded-[var(--radius-lg)] p-4 space-y-3">
+              <p className="text-sm font-medium text-destructive">비활성화 확인</p>
+              <p className="text-sm text-muted-foreground">
+                이 직원은 로그인이 불가능해지고 모든 배정이 해제됩니다.
+                데이터는 삭제되지 않으며 관리자가 언제든 복구할 수 있습니다.
+              </p>
+              <div className="flex gap-2">
+                <Button variant="destructive" size="sm" onClick={handleDeactivate} loading={isDeactivating}>확인, 비활성화</Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowDeactivateConfirm(false)}>취소</Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </form>
   )
 }
