@@ -4,7 +4,7 @@ import { useEmployeeTasks } from '@/lib/hooks/useEmployeeTasks'
 import SkillBadge from '@/components/ui/SkillBadge'
 import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
 import Link from 'next/link'
-import { use, useState } from 'react'
+import { use, useState, useRef, useEffect } from 'react'
 import type { EmployeeSkill, Allocation, Proficiency } from '@/lib/types'
 import { Avatar, Button, Card, CardBody, ProgressBar, Skeleton, SkeletonCircle, SkeletonText, PageTransition } from '@/components/ui/primitives'
 import { PencilSimple, ShareNetwork } from '@phosphor-icons/react'
@@ -27,12 +27,21 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const { data: tasks } = useEmployeeTasks(id)
   const { isAdmin } = useAuth()
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
+
   const { mutate: share, isPending: sharing } = useMutation({
     mutationFn: () => createShareLink(id),
     onSuccess: (res) => {
-      navigator.clipboard.writeText(res.url)
+      navigator.clipboard.writeText(res.url).catch(() => setCopiedUrl(null))
       setCopiedUrl(res.url)
-      setTimeout(() => setCopiedUrl(null), 3000)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => setCopiedUrl(null), 3000)
     },
   })
 

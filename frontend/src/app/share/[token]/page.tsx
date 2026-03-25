@@ -52,8 +52,8 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
             <p className="text-sm text-muted-foreground">배정된 프로젝트가 없습니다.</p>
           ) : (
             <div className="space-y-2">
-              {data.allocations.map((a, i) => (
-                <div key={i} className="flex justify-between text-sm border border-border rounded-[var(--radius-lg)] p-3">
+              {data.allocations.map((a) => (
+                <div key={`${a.projectName}-${a.startDate}`} className="flex justify-between text-sm border border-border rounded-[var(--radius-lg)] p-3">
                   <div>
                     <p className="font-medium">{a.projectName}</p>
                     <p className="text-muted-foreground">{a.roleInProject}</p>
