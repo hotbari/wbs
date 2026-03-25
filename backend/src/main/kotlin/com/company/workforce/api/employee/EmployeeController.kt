@@ -36,9 +36,11 @@ class EmployeeController(
         @RequestParam search: String?,
         @RequestParam department: String?,
         @RequestParam employmentType: EmploymentType?,
+        @RequestParam(required = false) skillIds: List<UUID>?,
+        @RequestParam(required = false) maxAllocationPercent: Int?,
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "20") pageSize: Int
-    ) = employeeService.list(search, department, employmentType, PageRequest.of(page - 1, pageSize))
+    ) = employeeService.list(search, department, employmentType, skillIds, maxAllocationPercent, PageRequest.of(page - 1, pageSize))
 
     @GetMapping("/available")
     fun available(

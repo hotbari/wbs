@@ -2,6 +2,12 @@ export type UserRole = 'ADMIN' | 'EMPLOYEE'
 export type EmploymentType = 'FULL_TIME' | 'CONTRACT' | 'PART_TIME'
 export type Proficiency = 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT'
 
+export interface SkillTag {
+  skillId: string
+  name: string
+  proficiency: Proficiency
+}
+
 export interface AuthUser {
   id: string
   email: string
@@ -18,6 +24,7 @@ export interface EmployeeSummary {
   jobTitle: string
   employmentType: EmploymentType
   totalAllocationPercent: number
+  topSkills: SkillTag[]
 }
 
 export interface EmployeeDetail extends EmployeeSummary {

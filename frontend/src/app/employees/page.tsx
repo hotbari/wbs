@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useEmployeeList } from '@/lib/hooks/useEmployees'
 import EmployeeCard from '@/components/ui/EmployeeCard'
-import { Button, Input, Skeleton, SkeletonCircle, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
+import SkillFilterPanel from '@/components/ui/SkillFilterPanel'
+import { Button, Input, Select, Skeleton, SkeletonCircle, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
 import { Plus, MagnifyingGlass, Users } from '@phosphor-icons/react'
 import { Card, CardBody } from '@/components/ui/primitives'
 
@@ -24,15 +25,21 @@ function EmployeeCardSkeleton() {
 export default function EmployeesPage() {
   const [search, setSearch] = useState('')
   const [department, setDepartment] = useState('')
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([])
+  const [maxAllocationPercent, setMaxAllocationPercent] = useState<number | undefined>(undefined)
   const [page, setPage] = useState(1)
   const { isAdmin } = useAuth()
   const { data, isLoading, error } = useEmployeeList({
     search: search || undefined,
     department: department || undefined,
+    skillIds: selectedSkillIds.length > 0 ? selectedSkillIds : undefined,
+    maxAllocationPercent,
     page,
   })
 
   const totalPages = data ? Math.ceil(data.total / data.pageSize) : 1
+
+  function resetPage() { setPage(1) }
 
   return (
     <PageTransition>
@@ -44,23 +51,42 @@ export default function EmployeesPage() {
           </Link>
         )}
       </div>
-      <div className="flex gap-3 mb-6">
+
+      <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative">
           <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="이름으로 검색..."
             value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            onChange={e => { setSearch(e.target.value); resetPage() }}
             className="pl-9 w-64"
           />
         </div>
         <Input
           placeholder="부서"
           value={department}
-          onChange={e => { setDepartment(e.target.value); setPage(1) }}
-          className="w-48"
+          onChange={e => { setDepartment(e.target.value); resetPage() }}
+          className="w-40"
         />
+        <SkillFilterPanel
+          selectedSkillIds={selectedSkillIds}
+          onChange={ids => { setSelectedSkillIds(ids); resetPage() }}
+        />
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-muted-foreground whitespace-nowrap">최대 배정</label>
+          <Select
+            className="w-32"
+            value={maxAllocationPercent ?? ''}
+            onChange={e => { setMaxAllocationPercent(e.target.value ? Number(e.target.value) : undefined); resetPage() }}
+          >
+            <option value="">제한 없음</option>
+            <option value="50">50% 이하</option>
+            <option value="80">80% 이하</option>
+            <option value="100">100% 이하</option>
+          </Select>
+        </div>
       </div>
+
       {error && (
         <div className="border border-destructive/30 bg-destructive-light rounded-[var(--radius-lg)] px-4 py-3 text-sm text-destructive mb-6">
           직원 목록을 불러오지 못했습니다.

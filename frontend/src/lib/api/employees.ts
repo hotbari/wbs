@@ -4,6 +4,8 @@ import { EmployeeDetail, EmployeeSummary, PageResponse } from '../types'
 export async function listEmployees(params?: {
   search?: string
   department?: string
+  skillIds?: string[]
+  maxAllocationPercent?: number
   page?: number
   pageSize?: number
 }): Promise<PageResponse<EmployeeSummary>> {
