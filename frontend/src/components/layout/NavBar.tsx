@@ -31,8 +31,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 export default function NavBar() {
   const { user, logout, isAdmin, isHydrated } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { data: myTasks } = useMyTasks()
-  const { data: health } = useProjectHealth()
+  const { data: myTasks } = useMyTasks(!!user)
+  const { data: health } = useProjectHealth(isAdmin)
 
   if (!user && isHydrated) return null
   if (!isHydrated) return (

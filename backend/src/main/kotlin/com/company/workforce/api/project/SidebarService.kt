@@ -29,6 +29,21 @@ class SidebarService(
     }
 
     @Transactional(readOnly = true)
+    fun getEmployeeTasks(employeeId: UUID): List<MyTaskResponse> {
+        return taskRepository.findByAssigneeIdOrderByCreatedAtAsc(employeeId)
+            .map { task ->
+                val phase = phaseRepository.findById(task.phaseId).orElseThrow()
+                val project = projectRepository.findById(phase.projectId).orElseThrow()
+                MyTaskResponse(
+                    id = task.id, title = task.title, status = task.status,
+                    progressPercent = task.progressPercent, dueDate = task.dueDate,
+                    project = ProjectRef(project.id, project.name),
+                    phase = PhaseRef(phase.id, phase.name)
+                )
+            }
+    }
+
+    @Transactional(readOnly = true)
     fun getProjectHealth(): List<ProjectHealthResponse> {
         return projectRepository.findAllBy(org.springframework.data.domain.Pageable.unpaged()).content
             .filter { it.status != ProjectStatus.ARCHIVED }

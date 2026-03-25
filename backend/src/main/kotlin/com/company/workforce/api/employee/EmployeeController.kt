@@ -2,6 +2,8 @@ package com.company.workforce.api.employee
 
 import com.company.workforce.api.allocation.AllocationService
 import com.company.workforce.api.allocation.dto.AllocationResponse
+import com.company.workforce.api.project.SidebarService
+import com.company.workforce.api.project.dto.MyTaskResponse
 import com.company.workforce.api.common.ForbiddenException
 import com.company.workforce.api.common.UnauthorizedException
 import com.company.workforce.api.employee.dto.CreateEmployeeRequest
@@ -25,7 +27,8 @@ import java.util.UUID
 class EmployeeController(
     private val employeeService: EmployeeService,
     private val userRepository: UserRepository,
-    private val allocationService: AllocationService
+    private val allocationService: AllocationService,
+    private val sidebarService: SidebarService
 ) {
 
     @GetMapping
@@ -70,6 +73,10 @@ class EmployeeController(
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deactivate(@PathVariable id: UUID) = employeeService.deactivate(id)
+
+    @GetMapping("/{id}/tasks")
+    fun listTasks(@PathVariable id: UUID): List<MyTaskResponse> =
+        sidebarService.getEmployeeTasks(id)
 
     @GetMapping("/{id}/allocations")
     @PreAuthorize("isAuthenticated()")
