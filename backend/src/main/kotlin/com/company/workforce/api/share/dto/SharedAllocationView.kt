@@ -3,13 +3,12 @@ package com.company.workforce.api.share.dto
 import java.time.LocalDateTime
 
 data class SharedAllocationView(
-    val employeeId: String,
     val fullName: String,
     val jobTitle: String,
     val department: String,
     val totalAllocationPercent: Long,
     val allocations: List<AllocationSummary>,
-    val generatedAt: LocalDateTime = LocalDateTime.now()
+    val generatedAt: LocalDateTime
 ) {
     data class AllocationSummary(
         val projectName: String,

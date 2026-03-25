@@ -54,7 +54,6 @@ class ShareService(
             .filter { it.isActive && it.startDate <= today && (it.endDate == null || it.endDate!! >= today) }
 
         return SharedAllocationView(
-            employeeId = employee.id.toString(),
             fullName = employee.fullName,
             jobTitle = employee.jobTitle,
             department = employee.department,
@@ -67,7 +66,8 @@ class ShareService(
                     startDate = a.startDate.toString(),
                     endDate = a.endDate?.toString()
                 )
-            }
+            },
+            generatedAt = LocalDateTime.now()
         )
     }
 }
