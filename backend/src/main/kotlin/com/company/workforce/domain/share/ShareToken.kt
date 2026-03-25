@@ -11,5 +11,5 @@ class ShareToken(
     val token: UUID = UUID.randomUUID(),
     val employeeId: UUID,
     val expiresAt: LocalDateTime,
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: LocalDateTime = LocalDateTime.now(java.time.ZoneOffset.UTC)
 )

@@ -28,7 +28,7 @@ class ShareService(
         val shareToken = shareTokenRepository.save(
             ShareToken(
                 employeeId = employeeId,
-                expiresAt = LocalDateTime.now().plusDays(30)
+                expiresAt = LocalDateTime.now(java.time.ZoneOffset.UTC).plusDays(30)
             )
         )
         return ShareLinkResponse(
@@ -42,7 +42,7 @@ class ShareService(
     fun resolveToken(token: UUID): SharedAllocationView {
         val shareToken = shareTokenRepository.findByToken(token)
             ?: throw NotFoundException("Share link not found or expired")
-        if (shareToken.expiresAt.isBefore(LocalDateTime.now()))
+        if (shareToken.expiresAt.isBefore(LocalDateTime.now(java.time.ZoneOffset.UTC)))
             throw NotFoundException("Share link expired")
 
         val employee = employeeRepository.findById(shareToken.employeeId)

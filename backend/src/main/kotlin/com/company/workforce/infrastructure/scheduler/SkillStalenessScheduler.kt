@@ -1,6 +1,7 @@
 package com.company.workforce.infrastructure.scheduler
 
 import com.company.workforce.domain.employee.EmployeeRepository
+import com.company.workforce.domain.share.ShareTokenRepository
 import com.company.workforce.infrastructure.email.EmailService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -13,10 +14,17 @@ import java.time.LocalDateTime
 class SkillStalenessScheduler(
     private val employeeRepository: EmployeeRepository,
     private val emailService: EmailService,
+    private val shareTokenRepository: ShareTokenRepository,
     @Value("\${skill-staleness.threshold-days:90}") private val thresholdDays: Long,
     @Value("\${skill-staleness.from-email:noreply@workforce.internal}") private val fromEmail: String
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    @Scheduled(cron = "0 0 3 * * SUN")  // Every Sunday at 03:00
+    fun cleanupExpiredShareTokens() {
+        shareTokenRepository.deleteByExpiresAtBefore(LocalDateTime.now(java.time.ZoneOffset.UTC))
+        log.info("Cleaned up expired share tokens")
+    }
 
     // Every Monday at 09:00
     @Scheduled(cron = "0 0 9 * * MON")
