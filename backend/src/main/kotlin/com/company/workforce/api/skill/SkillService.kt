@@ -115,12 +115,17 @@ class SkillService(
             ) }
         employeeSkillRepository.saveAll(toInsert)
 
+        // Update skillsLastUpdatedAt for all affected employees
+        sourceAssignments.map { it.employeeId }.distinct().forEach { empId ->
+            touchSkillsUpdated(empId)
+        }
+
         skillRepository.delete(source)
     }
 
     private fun touchSkillsUpdated(employeeId: UUID) {
         val employee = employeeRepository.findById(employeeId).orElse(null) ?: return
-        employee.skillsLastUpdatedAt = java.time.LocalDateTime.now()
+        employee.skillsLastUpdatedAt = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC)
         employeeRepository.save(employee)
     }
 

@@ -21,7 +21,7 @@ class SkillStalenessScheduler(
     // Every Monday at 09:00
     @Scheduled(cron = "0 0 9 * * MON")
     fun sendStalenessNudges() {
-        val staleThreshold = LocalDateTime.now().minusDays(thresholdDays)
+        val staleThreshold = LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(thresholdDays)
         val hiredBefore = LocalDate.now().minusDays(thresholdDays)
         val staleEmployees = employeeRepository.findStaleSkillEmployees(hiredBefore, staleThreshold)
         log.info("Skill staleness check: {} employees to nudge", staleEmployees.size)
