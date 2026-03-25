@@ -96,21 +96,24 @@ class SkillService(
         skillRepository.findById(targetId).orElseThrow { NotFoundException("Target skill not found") }
 
         val sourceAssignments = employeeSkillRepository.findBySkillId(sourceId)
-        for (es in sourceAssignments) {
-            val alreadyHasTarget = employeeSkillRepository.existsByEmployeeIdAndSkillId(es.employeeId, targetId)
-            if (alreadyHasTarget) {
-                employeeSkillRepository.delete(es)
-            } else {
-                employeeSkillRepository.delete(es)
-                employeeSkillRepository.save(EmployeeSkill(
-                    employeeId = es.employeeId,
-                    skillId = targetId,
-                    proficiency = es.proficiency,
-                    certified = es.certified,
-                    note = es.note
-                ))
-            }
-        }
+        val targetEmployeeIds = employeeSkillRepository.findBySkillId(targetId).map { it.employeeId }.toSet()
+
+        // Phase 1: delete all source assignments first, then flush
+        employeeSkillRepository.deleteAll(sourceAssignments)
+        employeeSkillRepository.flush()
+
+        // Phase 2: insert new assignments only where employee didn't already have target skill
+        val toInsert = sourceAssignments
+            .filter { it.employeeId !in targetEmployeeIds }
+            .map { EmployeeSkill(
+                employeeId = it.employeeId,
+                skillId = targetId,
+                proficiency = it.proficiency,
+                certified = it.certified,
+                note = it.note
+            ) }
+        employeeSkillRepository.saveAll(toInsert)
+
         skillRepository.delete(source)
     }
 

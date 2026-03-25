@@ -16,6 +16,10 @@ import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
+import com.company.workforce.domain.skill.EmployeeSkill
+import com.company.workforce.domain.skill.Proficiency
+import com.company.workforce.domain.skill.Skill
+import org.junit.jupiter.api.Assertions.*
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -172,6 +176,83 @@ class SkillControllerTest : IntegrationTestBase() {
             content = """{"skillId":"$skillId","proficiency":"BEGINNER"}"""
         }.andExpect {
             status { isForbidden() }
+        }
+    }
+
+    @Test
+    fun `mergeSkills happy path - source deleted, assignments moved to target, no duplicates`() {
+        val sourceSkill = skillRepository.save(Skill(name = "OldSkill", category = "Backend"))
+        val targetSkill = skillRepository.save(Skill(name = "NewSkill", category = "Backend"))
+
+        val emp1 = createEmployee(employeeRepository, email = "merge1@test.com", fullName = "Merge Emp 1")
+        val emp2 = createEmployee(employeeRepository, email = "merge2@test.com", fullName = "Merge Emp 2")
+
+        // emp1 has sourceSkill only, emp2 has both sourceSkill and targetSkill
+        employeeSkillRepository.save(EmployeeSkill(employeeId = emp1.id, skillId = sourceSkill.id, proficiency = Proficiency.EXPERT))
+        employeeSkillRepository.save(EmployeeSkill(employeeId = emp2.id, skillId = sourceSkill.id, proficiency = Proficiency.BEGINNER))
+        employeeSkillRepository.save(EmployeeSkill(employeeId = emp2.id, skillId = targetSkill.id, proficiency = Proficiency.INTERMEDIATE))
+
+        mvc.post("/api/admin/skills/merge") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"sourceId":"${sourceSkill.id}","targetId":"${targetSkill.id}"}"""
+        }.andExpect {
+            status { isNoContent() }
+        }
+
+        // Source skill should be deleted
+        assertFalse(skillRepository.existsById(sourceSkill.id))
+
+        // emp1 should now have targetSkill
+        val emp1Skills = employeeSkillRepository.findByEmployeeId(emp1.id)
+        assertEquals(1, emp1Skills.size)
+        assertEquals(targetSkill.id, emp1Skills[0].skillId)
+        assertEquals(Proficiency.EXPERT, emp1Skills[0].proficiency)
+
+        // emp2 should still have exactly one assignment for targetSkill (no duplicate)
+        val emp2Skills = employeeSkillRepository.findByEmployeeId(emp2.id)
+        assertEquals(1, emp2Skills.size)
+        assertEquals(targetSkill.id, emp2Skills[0].skillId)
+    }
+
+    @Test
+    fun `mergeSkills with same sourceId and targetId returns 409`() {
+        val skill = skillRepository.save(Skill(name = "SameSkill", category = "Backend"))
+
+        mvc.post("/api/admin/skills/merge") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"sourceId":"${skill.id}","targetId":"${skill.id}"}"""
+        }.andExpect {
+            status { isConflict() }
+        }
+    }
+
+    @Test
+    fun `mergeSkills with non-existent source returns 404`() {
+        val targetSkill = skillRepository.save(Skill(name = "TargetSkill", category = "Backend"))
+        val nonExistentId = java.util.UUID.randomUUID()
+
+        mvc.post("/api/admin/skills/merge") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"sourceId":"$nonExistentId","targetId":"${targetSkill.id}"}"""
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `mergeSkills with non-existent target returns 404`() {
+        val sourceSkill = skillRepository.save(Skill(name = "SourceSkill", category = "Backend"))
+        val nonExistentId = java.util.UUID.randomUUID()
+
+        mvc.post("/api/admin/skills/merge") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"sourceId":"${sourceSkill.id}","targetId":"$nonExistentId"}"""
+        }.andExpect {
+            status { isNotFound() }
         }
     }
 

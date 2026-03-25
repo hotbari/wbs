@@ -3,6 +3,7 @@ package com.company.workforce.api.skill
 import com.company.workforce.api.common.UnauthorizedException
 import com.company.workforce.api.skill.dto.CreateSkillRequest
 import com.company.workforce.api.skill.dto.EmployeeSkillRequest
+import com.company.workforce.api.skill.dto.MergeSkillsRequest
 import com.company.workforce.domain.user.UserRepository
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -11,8 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
-
-data class MergeSkillsRequest(val sourceId: UUID, val targetId: UUID)
 
 @RestController
 class SkillController(
@@ -73,5 +72,5 @@ class SkillController(
     @PostMapping("/api/admin/skills/merge")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun mergeSkills(@RequestBody req: MergeSkillsRequest) = skillService.mergeSkills(req.sourceId, req.targetId)
+    fun mergeSkills(@Valid @RequestBody req: MergeSkillsRequest) = skillService.mergeSkills(req.sourceId, req.targetId)
 }
