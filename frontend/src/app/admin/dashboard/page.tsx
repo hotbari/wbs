@@ -80,15 +80,36 @@ export default function DashboardPage() {
 
               <Card>
                 <CardBody>
-                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-4">고할당 직원</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">고할당 직원</h2>
+                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-warning inline-block" />80%+</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive inline-block" />100%+</span>
+                    </div>
+                  </div>
                   <div className="space-y-2">
-                    {data.topOverAllocated.map(({ employee, allocationPercent }) => (
-                      <div key={employee.id} className="flex items-center gap-4 border border-border rounded-[var(--radius-lg)] p-3">
-                        <span className="text-sm font-medium w-40 truncate">{employee.fullName}</span>
-                        <div className="flex-1"><ProgressBar value={allocationPercent} /></div>
-                        <span className="text-sm text-muted-foreground w-12 text-right">{allocationPercent}%</span>
-                      </div>
-                    ))}
+                    {data.topOverAllocated.map(({ employee, allocationPercent }) => {
+                      const isOver = allocationPercent >= 100
+                      const isWarn = allocationPercent >= 80 && allocationPercent < 100
+                      return (
+                        <div
+                          key={employee.id}
+                          className={`flex items-center gap-4 border rounded-[var(--radius-lg)] p-3 ${
+                            isOver ? 'border-destructive/40 bg-destructive/5' :
+                            isWarn ? 'border-warning/40 bg-warning/5' :
+                            'border-border'
+                          }`}
+                        >
+                          <span className="text-sm font-medium w-40 truncate">{employee.fullName}</span>
+                          <div className="flex-1"><ProgressBar value={allocationPercent} /></div>
+                          <span className={`text-sm w-12 text-right font-medium ${
+                            isOver ? 'text-destructive' : isWarn ? 'text-warning' : 'text-muted-foreground'
+                          }`}>
+                            {allocationPercent}%
+                          </span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </CardBody>
               </Card>
