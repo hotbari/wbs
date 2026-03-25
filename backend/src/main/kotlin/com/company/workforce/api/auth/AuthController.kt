@@ -21,7 +21,7 @@ class AuthController(
     fun login(@Valid @RequestBody request: LoginRequest, response: HttpServletResponse): LoginResponse {
         val (loginResponse, rawRefresh) = authService.login(request)
         response.addCookie(Cookie("refreshToken", rawRefresh).apply {
-            isHttpOnly = true; secure = true; path = "/api/auth/refresh"; maxAge = 7 * 24 * 60 * 60
+            isHttpOnly = true; secure = false; path = "/api/auth/refresh"; maxAge = 7 * 24 * 60 * 60
         })
         return loginResponse
     }

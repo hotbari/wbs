@@ -16,13 +16,14 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// On 401/403, attempt token refresh once then redirect to login
+// On 401 (unauthenticated), attempt token refresh once then redirect to login
+// 403 (forbidden) is NOT retried — it means the user lacks the required role
 apiClient.interceptors.response.use(
   (r) => r,
   async (error) => {
     const original = error.config
     const status = error.response?.status
-    if ((status === 401 || status === 403) && !original._retry) {
+    if (status === 401 && !original._retry) {
       original._retry = true
       try {
         const { data } = await axios.post(`${BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
