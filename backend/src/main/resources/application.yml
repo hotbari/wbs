@@ -12,6 +12,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
+  mail:
+    host: ${MAIL_HOST:localhost}    # non-empty default keeps auto-config bean alive in dev
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:}
+    password: ${MAIL_PASS:}
+    test-connection: false          # prevents startup connection check in dev
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   secret: ${JWT_SECRET:change-me-in-production-must-be-256-bits-long}
@@ -26,3 +38,7 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:http://localhost:3000}
+
+skill-staleness:
+  threshold-days: 90
+  from-email: ${NUDGE_FROM_EMAIL:noreply@workforce.internal}

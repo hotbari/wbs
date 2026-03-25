@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.JdbcType
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
@@ -21,5 +22,6 @@ class Employee(
     @JdbcType(PostgreSQLEnumJdbcType::class)
     var employmentType: EmploymentType,
     var hiredAt: LocalDate,
-    var isActive: Boolean = true
+    var isActive: Boolean = true,
+    var skillsLastUpdatedAt: LocalDateTime? = null
 )

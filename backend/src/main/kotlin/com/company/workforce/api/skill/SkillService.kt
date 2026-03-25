@@ -70,7 +70,7 @@ class SkillService(
         return employeeSkillRepository.save(EmployeeSkill(
             employeeId = employeeId, skillId = request.skillId,
             proficiency = request.proficiency, certified = request.certified ?: false, note = request.note
-        ))
+        )).also { touchSkillsUpdated(employeeId) }
     }
 
     fun updateEmployeeSkill(employeeId: UUID, skillId: UUID, request: EmployeeSkillRequest, caller: User): EmployeeSkill {
@@ -80,7 +80,7 @@ class SkillService(
         es.proficiency = request.proficiency
         request.certified?.let { es.certified = it }
         request.note?.let { es.note = it }
-        return employeeSkillRepository.save(es)
+        return employeeSkillRepository.save(es).also { touchSkillsUpdated(employeeId) }
     }
 
     fun removeEmployeeSkill(employeeId: UUID, skillId: UUID, caller: User) {
@@ -88,6 +88,7 @@ class SkillService(
         val es = employeeSkillRepository.findByEmployeeIdAndSkillId(employeeId, skillId)
             ?: throw NotFoundException("Skill not assigned")
         employeeSkillRepository.delete(es)
+        touchSkillsUpdated(employeeId)
     }
 
     fun mergeSkills(sourceId: UUID, targetId: UUID) {
@@ -115,6 +116,12 @@ class SkillService(
         employeeSkillRepository.saveAll(toInsert)
 
         skillRepository.delete(source)
+    }
+
+    private fun touchSkillsUpdated(employeeId: UUID) {
+        val employee = employeeRepository.findById(employeeId).orElse(null) ?: return
+        employee.skillsLastUpdatedAt = java.time.LocalDateTime.now()
+        employeeRepository.save(employee)
     }
 
     private fun assertCanEditEmployee(employeeId: UUID, caller: User) {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 interface EmployeeRepository : JpaRepository<Employee, UUID> {
@@ -63,4 +64,15 @@ interface EmployeeRepository : JpaRepository<Employee, UUID> {
         toDate: LocalDate,
         pageable: Pageable
     ): Page<Employee>
+
+    @Query("""
+        SELECT e FROM Employee e
+        WHERE e.isActive = true
+          AND e.hiredAt <= :hiredBefore
+          AND (e.skillsLastUpdatedAt IS NULL OR e.skillsLastUpdatedAt < :staleThreshold)
+    """)
+    fun findStaleSkillEmployees(
+        @Param("hiredBefore") hiredBefore: LocalDate,
+        @Param("staleThreshold") staleThreshold: LocalDateTime
+    ): List<Employee>
 }
