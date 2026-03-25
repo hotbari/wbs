@@ -170,3 +170,9 @@ export interface SharedAllocationView {
   }>
   generatedAt: string
 }
+
+export interface AvailabilityPeriod {
+  from: string
+  to: string | null
+  availablePercent: number
+}

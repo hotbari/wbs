@@ -5,12 +5,13 @@ import SkillBadge from '@/components/ui/SkillBadge'
 import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
 import Link from 'next/link'
 import { use, useState, useRef, useEffect } from 'react'
-import type { EmployeeSkill, Allocation, Proficiency } from '@/lib/types'
+import type { EmployeeSkill, Allocation, Proficiency, AvailabilityPeriod } from '@/lib/types'
 import { Avatar, Button, Card, CardBody, ProgressBar, Skeleton, SkeletonCircle, SkeletonText, PageTransition } from '@/components/ui/primitives'
 import { PencilSimple, ShareNetwork } from '@phosphor-icons/react'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createShareLink } from '@/lib/api/share'
+import { getEmployeeAvailability } from '@/lib/api/employees'
 
 function DetailSkeleton() {
   return (
@@ -25,6 +26,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params)
   const { data: employee, isLoading } = useEmployee(id)
   const { data: tasks } = useEmployeeTasks(id)
+  const { data: availability } = useQuery({
+    queryKey: ['availability', id],
+    queryFn: () => getEmployeeAvailability(id),
+  })
   const { isAdmin } = useAuth()
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -98,6 +103,33 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             <ProgressBar value={employee.totalAllocationPercent} />
           </CardBody>
         </Card>
+
+        {availability && availability.length > 0 && (
+          <Card>
+            <CardBody className="space-y-3">
+              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                향후 가용 예측
+              </h2>
+              <div className="space-y-2">
+                {availability.map((period: AvailabilityPeriod, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {period.from}
+                      {period.to ? ` ~ ${period.to}` : ' 이후'}
+                    </span>
+                    <span className={`font-medium ${
+                      period.availablePercent >= 50 ? 'text-accent' :
+                      period.availablePercent > 0   ? 'text-warning' :
+                      'text-destructive'
+                    }`}>
+                      {period.availablePercent}% 가용
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
+        )}
 
         {employee.skills.length > 0 && (
           <Card>

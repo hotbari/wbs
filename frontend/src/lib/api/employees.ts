@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import { EmployeeDetail, EmployeeSummary, PageResponse } from '../types'
+import { EmployeeDetail, EmployeeSummary, PageResponse, AvailabilityPeriod } from '../types'
 
 export async function listEmployees(params?: {
   search?: string
@@ -48,5 +48,10 @@ export async function listEmployeeAllocations(id: string) {
 
 export async function listEmployeeSkills(id: string) {
   const { data } = await apiClient.get(`/api/employees/${id}/skills`)
+  return data
+}
+
+export async function getEmployeeAvailability(id: string): Promise<AvailabilityPeriod[]> {
+  const { data } = await apiClient.get<AvailabilityPeriod[]>(`/api/employees/${id}/availability`)
   return data
 }
