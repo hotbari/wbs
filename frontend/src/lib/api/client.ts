@@ -5,6 +5,19 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
+  paramsSerializer: (params) => {
+    const parts: string[] = []
+    for (const key of Object.keys(params)) {
+      const value = params[key]
+      if (value === undefined || value === null) continue
+      if (Array.isArray(value)) {
+        value.forEach(v => parts.push(`${key}=${encodeURIComponent(v)}`))
+      } else {
+        parts.push(`${key}=${encodeURIComponent(value)}`)
+      }
+    }
+    return parts.join('&')
+  },
 })
 
 // Attach access token to every request

@@ -8,8 +8,8 @@ interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ProgressBar({ value, size = 'md', className, ...props }: ProgressBarProps) {
   const clamped = Math.min(Math.max(value, 0), 100)
   const color =
-    value >= 100 ? 'bg-destructive' :
-    value >= 80 ? 'bg-warning' :
+    clamped >= 100 ? 'bg-destructive' :
+    clamped >= 80 ? 'bg-warning' :
     'bg-accent'
 
   return (

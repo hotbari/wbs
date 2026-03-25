@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { useEmployeeList } from '@/lib/hooks/useEmployees'
 import EmployeeCard from '@/components/ui/EmployeeCard'
 import SkillFilterPanel from '@/components/ui/SkillFilterPanel'
-import { Button, Input, Skeleton, SkeletonCircle, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
+import { Button, Input, Select, Skeleton, SkeletonCircle, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
 import { Plus, MagnifyingGlass, Users } from '@phosphor-icons/react'
 import { Card, CardBody } from '@/components/ui/primitives'
 
@@ -74,8 +74,8 @@ export default function EmployeesPage() {
         />
         <div className="flex items-center gap-2">
           <label className="text-sm text-muted-foreground whitespace-nowrap">최대 배정</label>
-          <select
-            className="text-sm border border-border rounded-[var(--radius-md)] px-2 py-2 bg-background"
+          <Select
+            className="w-32"
             value={maxAllocationPercent ?? ''}
             onChange={e => { setMaxAllocationPercent(e.target.value ? Number(e.target.value) : undefined); resetPage() }}
           >
@@ -83,7 +83,7 @@ export default function EmployeesPage() {
             <option value="50">50% 이하</option>
             <option value="80">80% 이하</option>
             <option value="100">100% 이하</option>
-          </select>
+          </Select>
         </div>
       </div>
 
