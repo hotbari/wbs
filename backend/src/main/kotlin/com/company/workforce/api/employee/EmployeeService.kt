@@ -46,8 +46,9 @@ class EmployeeService(
         pageable: Pageable
     ): PageResponse<EmployeeSummary> {
         val page = employeeRepository.search(search, department, employmentType, skillIds?.takeIf { it.isNotEmpty() }, maxAllocationPercent, pageable)
+        val skillsMap = buildSkillsMap(page.content.map { it.id })
         return PageResponse(
-            data = page.content.map { it.toSummary() },
+            data = page.content.map { it.toSummary(skillsMap[it.id] ?: emptyList()) },
             page = pageable.pageNumber + 1,
             pageSize = pageable.pageSize,
             total = page.totalElements
@@ -138,22 +139,32 @@ class EmployeeService(
         pageable: Pageable
     ): PageResponse<EmployeeSummary> {
         val page = employeeRepository.findAvailable(minAvailablePercent, fromDate, toDate, pageable)
+        val skillsMap = buildSkillsMap(page.content.map { it.id })
         return PageResponse(
-            data = page.content.map { it.toSummary() },
+            data = page.content.map { it.toSummary(skillsMap[it.id] ?: emptyList()) },
             page = pageable.pageNumber + 1,
             pageSize = pageable.pageSize,
             total = page.totalElements
         )
     }
 
-    private fun Employee.toSummary(): EmployeeSummary {
-        val total = assignmentRepository.sumCurrentAllocation(id)
-        val empSkills = employeeSkillRepository.findByEmployeeId(id).take(3)
+    private fun buildSkillsMap(employeeIds: List<UUID>): Map<UUID, List<SkillTag>> {
+        if (employeeIds.isEmpty()) return emptyMap()
+        val empSkills = employeeSkillRepository.findByEmployeeIdIn(employeeIds)
         val skillIds = empSkills.map { it.skillId }.toSet()
         val skillNameMap = skillRepository.findAllById(skillIds).associate { it.id to it.name }
-        val topSkills = empSkills.map { es ->
-            SkillTag(skillId = es.skillId, name = skillNameMap[es.skillId] ?: "", proficiency = es.proficiency.name)
-        }
+        return empSkills
+            .filter { skillNameMap.containsKey(it.skillId) }
+            .groupBy { it.employeeId }
+            .mapValues { (_, skills) ->
+                skills.take(3).map { es ->
+                    SkillTag(skillId = es.skillId, name = skillNameMap[es.skillId]!!, proficiency = es.proficiency.name)
+                }
+            }
+    }
+
+    private fun Employee.toSummary(topSkills: List<SkillTag> = emptyList()): EmployeeSummary {
+        val total = assignmentRepository.sumCurrentAllocation(id)
         return EmployeeSummary(id, fullName, email, department, team, jobTitle, employmentType.name, total, topSkills)
     }
 

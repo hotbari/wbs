@@ -5,6 +5,7 @@ import java.util.UUID
 
 interface EmployeeSkillRepository : JpaRepository<EmployeeSkill, UUID> {
     fun findByEmployeeId(employeeId: UUID): List<EmployeeSkill>
+    fun findByEmployeeIdIn(employeeIds: List<UUID>): List<EmployeeSkill>
     fun findByEmployeeIdAndSkillId(employeeId: UUID, skillId: UUID): EmployeeSkill?
     fun existsByEmployeeIdAndSkillId(employeeId: UUID, skillId: UUID): Boolean
     fun existsBySkillId(skillId: UUID): Boolean
