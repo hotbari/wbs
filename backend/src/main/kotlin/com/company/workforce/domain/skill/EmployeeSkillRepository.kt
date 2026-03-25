@@ -9,4 +9,5 @@ interface EmployeeSkillRepository : JpaRepository<EmployeeSkill, UUID> {
     fun findByEmployeeIdAndSkillId(employeeId: UUID, skillId: UUID): EmployeeSkill?
     fun existsByEmployeeIdAndSkillId(employeeId: UUID, skillId: UUID): Boolean
     fun existsBySkillId(skillId: UUID): Boolean
+    fun findBySkillId(skillId: UUID): List<EmployeeSkill>
 }

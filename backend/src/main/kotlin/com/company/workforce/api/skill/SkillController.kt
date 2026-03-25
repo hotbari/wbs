@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
+data class MergeSkillsRequest(val sourceId: UUID, val targetId: UUID)
+
 @RestController
 class SkillController(
     private val skillService: SkillService,
@@ -67,4 +69,9 @@ class SkillController(
         @AuthenticationPrincipal ud: UserDetails
     ) = skillService.removeEmployeeSkill(empId, skillId, userRepository.findByEmail(ud.username)
         ?: throw UnauthorizedException("User not found"))
+
+    @PostMapping("/api/admin/skills/merge")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun mergeSkills(@RequestBody req: MergeSkillsRequest) = skillService.mergeSkills(req.sourceId, req.targetId)
 }

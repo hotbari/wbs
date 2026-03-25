@@ -90,6 +90,30 @@ class SkillService(
         employeeSkillRepository.delete(es)
     }
 
+    fun mergeSkills(sourceId: UUID, targetId: UUID) {
+        if (sourceId == targetId) throw ConflictException("Source and target cannot be the same")
+        val source = skillRepository.findById(sourceId).orElseThrow { NotFoundException("Source skill not found") }
+        skillRepository.findById(targetId).orElseThrow { NotFoundException("Target skill not found") }
+
+        val sourceAssignments = employeeSkillRepository.findBySkillId(sourceId)
+        for (es in sourceAssignments) {
+            val alreadyHasTarget = employeeSkillRepository.existsByEmployeeIdAndSkillId(es.employeeId, targetId)
+            if (alreadyHasTarget) {
+                employeeSkillRepository.delete(es)
+            } else {
+                employeeSkillRepository.delete(es)
+                employeeSkillRepository.save(EmployeeSkill(
+                    employeeId = es.employeeId,
+                    skillId = targetId,
+                    proficiency = es.proficiency,
+                    certified = es.certified,
+                    note = es.note
+                ))
+            }
+        }
+        skillRepository.delete(source)
+    }
+
     private fun assertCanEditEmployee(employeeId: UUID, caller: User) {
         if (caller.role != UserRole.ADMIN && caller.employeeId != employeeId)
             throw ForbiddenException("Cannot edit another employee's skills")
