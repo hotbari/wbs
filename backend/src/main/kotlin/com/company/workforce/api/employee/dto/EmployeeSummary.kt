@@ -10,5 +10,6 @@ data class EmployeeSummary(
     val team: String?,
     val jobTitle: String,
     val employmentType: String,
-    val totalAllocationPercent: Long
+    val totalAllocationPercent: Long,
+    val topSkills: List<SkillTag> = emptyList()
 )
