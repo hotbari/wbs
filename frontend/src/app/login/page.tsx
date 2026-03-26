@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { Input, Button } from '@/components/ui/primitives'
 import { UsersThree, WarningCircle } from '@phosphor-icons/react'
+import LoginVisualPanel from '@/components/ui/LoginVisualPanel'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -29,11 +30,19 @@ export default function LoginPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh]">
-      <div className="flex items-center justify-center p-8">
-        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
+      {/* Left column — asymmetric top-left layout */}
+      <div className="flex flex-col justify-between min-h-[100dvh] p-8 lg:p-12">
+        {/* Logo top-left */}
+        <div className="flex items-center gap-2">
+          <UsersThree className="h-5 w-5 text-accent" weight="duotone" />
+          <span className="font-semibold text-foreground">Workforce</span>
+        </div>
+
+        {/* Form — vertically centered */}
+        <form onSubmit={handleSubmit} className="w-full max-w-xs space-y-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">로그인</h1>
-            <p className="text-sm text-muted-foreground mt-1">계정 정보를 입력해 주세요</p>
+            <p className="label-section mb-2">인력 배치 관리 플랫폼</p>
+            <h1 className="display-2">로그인</h1>
           </div>
           {error && (
             <div className="flex items-center gap-2 text-destructive text-sm bg-destructive-light border border-destructive/20 rounded-[var(--radius-md)] px-3 py-2">
@@ -56,14 +65,12 @@ export default function LoginPage() {
             로그인
           </Button>
         </form>
+
+        <p className="text-xs text-muted-foreground">© 2026 Workforce</p>
       </div>
-      <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-accent to-accent-dark p-12">
-        <div className="text-white text-center max-w-md">
-          <UsersThree className="h-16 w-16 mx-auto mb-6 opacity-90" weight="duotone" />
-          <h2 className="text-3xl font-bold mb-3">인력 배치 관리</h2>
-          <p className="text-accent-light text-lg">팀의 역량, 스킬, 프로젝트 배정을 한 곳에서 관리하세요.</p>
-        </div>
-      </div>
+
+      {/* Right column — floating tags visual */}
+      <LoginVisualPanel />
     </div>
   )
 }
