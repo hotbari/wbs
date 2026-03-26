@@ -1,5 +1,6 @@
 'use client'
 import { forwardRef } from 'react'
+import { motion } from 'framer-motion'
 import { CircleNotch } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
@@ -24,23 +25,26 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, disabled, children, ...props }, ref) => (
-    <button
+    <motion.button
       ref={ref}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
+      whileHover={{ y: -1, scale: 1.01 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       className={cn(
         'inline-flex items-center justify-center rounded-[var(--radius-md)] font-medium transition-colors',
-        'active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none',
+        'disabled:opacity-50 disabled:pointer-events-none',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         variants[variant],
         sizes[size],
         className,
       )}
-      {...props}
+      {...(props as React.ComponentPropsWithoutRef<typeof motion.button>)}
     >
       {loading && <CircleNotch className="h-4 w-4 animate-spin" />}
       {children}
-    </button>
+    </motion.button>
   ),
 )
 Button.displayName = 'Button'
