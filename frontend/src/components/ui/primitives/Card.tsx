@@ -31,15 +31,14 @@ export function CardFooter({ className, ...props }: CardProps) {
 export function MotionCard({ className, children, ...props }: CardProps) {
   return (
     <motion.div
-      whileHover={{ y: -2, boxShadow: 'var(--shadow-card-hover)' }}
+      whileHover={{ y: -3, boxShadow: 'var(--shadow-card-hover)' }}
       transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-      className={cn(
-        'bg-card rounded-[var(--radius-xl)] border border-border shadow-sm will-change-transform',
-        className,
-      )}
+      className={cn('bezel will-change-transform', className)}
       {...(props as React.ComponentPropsWithoutRef<typeof motion.div>)}
     >
-      {children}
+      <div className="bezel-inner overflow-hidden">
+        {children}
+      </div>
     </motion.div>
   )
 }

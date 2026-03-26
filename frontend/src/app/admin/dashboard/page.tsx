@@ -36,34 +36,41 @@ function MetricBentoCard({
   value,
   suffix = '',
   showBar = false,
+  delay = 0,
 }: {
   icon: React.ElementType
   label: string
   value: number
   suffix?: string
   showBar?: boolean
+  delay?: number
 }) {
   const animated = useCountUp(value)
   return (
     <motion.div
-      whileHover={{ y: -3 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-      className="relative bg-card rounded-[var(--radius-xl)] border border-border shadow-sm overflow-hidden p-5"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay, type: 'spring', stiffness: 300, damping: 28 }}
+      whileHover={{ y: -4 }}
+      className="bezel will-change-transform"
     >
-      {/* Corner glow */}
-      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-accent/8 blur-2xl pointer-events-none" />
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="h-4 w-4 text-accent" weight="duotone" />
-        <p className="label-section">{label}</p>
-      </div>
-      <p className="text-4xl font-bold font-mono tabular-nums tracking-tighter animate-count-in">
-        {animated}{suffix}
-      </p>
-      {showBar && (
-        <div className="mt-3">
-          <ProgressBar value={value} />
+      <div className="bezel-inner relative overflow-hidden p-5">
+        {/* Corner glow */}
+        <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-accent/10 blur-2xl pointer-events-none" />
+        <div className="flex items-center gap-2 mb-3">
+          <Icon className="h-4 w-4 text-accent" weight="duotone" />
+          <p className="label-section">{label}</p>
         </div>
-      )}
+        <p className="text-4xl font-bold font-mono tabular-nums tracking-tighter animate-count-in">
+          {animated}{suffix}
+        </p>
+        {showBar && (
+          <div className="mt-3">
+            <ProgressBar value={value} />
+          </div>
+        )}
+      </div>
     </motion.div>
   )
 }
@@ -178,15 +185,18 @@ export default function DashboardPage() {
   return (
     <AdminGuard>
       <PageTransition>
-        <div className="space-y-6">
-          <h1 className="heading-1">대시보드</h1>
+        <div className="space-y-8">
+          <div className="space-y-2">
+            <p className="eyebrow">관리자 대시보드</p>
+            <h1 className="heading-1">대시보드</h1>
+          </div>
           {isLoading ? <DashboardSkeleton /> : data ? (
             <>
               {/* Row 1 — 3 metric tiles */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <MetricBentoCard icon={Users} label="활성 직원" value={data.totalActiveEmployees} />
-                <MetricBentoCard icon={ChartBar} label="평균 할당률" value={Math.round(data.avgAllocationPercent)} suffix="%" showBar />
-                <MetricBentoCard icon={UserCircle} label="여유 인력" value={data.availableEmployees.length} />
+                <MetricBentoCard icon={Users} label="활성 직원" value={data.totalActiveEmployees} delay={0} />
+                <MetricBentoCard icon={ChartBar} label="평균 할당률" value={Math.round(data.avgAllocationPercent)} suffix="%" showBar delay={0.06} />
+                <MetricBentoCard icon={UserCircle} label="여유 인력" value={data.availableEmployees.length} delay={0.12} />
               </div>
 
               {/* Row 2 — 60/40 asymmetric */}

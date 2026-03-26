@@ -94,7 +94,10 @@ export default function EmployeesPage() {
         <aside className="hidden lg:block w-[220px] shrink-0">
           <div className="sticky top-20 space-y-1">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="heading-2">직원 목록</h2>
+              <div className="space-y-1">
+                <p className="eyebrow">인력 현황</p>
+                <h2 className="heading-2">직원 목록</h2>
+              </div>
               {isAdmin && (
                 <Link href="/admin/employees/new">
                   <Button size="sm"><Plus className="h-4 w-4" />추가</Button>
@@ -109,7 +112,10 @@ export default function EmployeesPage() {
         <main className="flex-1 min-w-0 pb-12">
           {/* Mobile header */}
           <div className="lg:hidden flex items-center justify-between mb-4">
-            <h1 className="heading-1">직원 목록</h1>
+            <div>
+              <p className="eyebrow mb-1">인력 현황</p>
+              <h1 className="heading-1">직원 목록</h1>
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="secondary"

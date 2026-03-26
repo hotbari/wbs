@@ -4,44 +4,52 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useMyTasks, useProjectHealth } from '@/lib/hooks/useSidebar'
-import { UsersThree, ListChecks, SignOut, List, X, Sun, Moon } from '@phosphor-icons/react'
+import { UsersThree, ListChecks, SignOut, Sun, Moon } from '@phosphor-icons/react'
 import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge, Avatar } from '@/components/ui/primitives'
 import { cn } from '@/lib/utils'
 import SidebarPanel from '@/components/ui/SidebarPanel'
 
-function NavLink({ href, children, mobile = false, onClick }: {
+/* ── Morphing hamburger icon ── */
+function HamburgerIcon({ open }: { open: boolean }) {
+  return (
+    <div className="relative flex flex-col justify-between w-[18px] h-[13px]">
+      <motion.span
+        animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+        className="block w-full h-[1.5px] bg-current rounded-full origin-center"
+      />
+      <motion.span
+        animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+        className="block w-full h-[1.5px] bg-current rounded-full"
+      />
+      <motion.span
+        animate={open ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+        className="block w-full h-[1.5px] bg-current rounded-full origin-center"
+      />
+    </div>
+  )
+}
+
+/* ── Desktop nav link with layoutId sliding pill ── */
+function NavLink({ href, children, onClick }: {
   href: string
   children: React.ReactNode
-  mobile?: boolean
   onClick?: () => void
 }) {
   const pathname = usePathname()
   const isActive = pathname === href || pathname.startsWith(href + '/')
 
-  if (mobile) {
-    return (
-      <Link
-        href={href}
-        onClick={onClick}
-        className={cn(
-          'flex items-center px-3 py-3 rounded-[var(--radius-md)] text-sm transition-colors',
-          isActive
-            ? 'text-foreground font-medium bg-muted'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-        )}
-      >
-        {children}
-      </Link>
-    )
-  }
-
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={cn(
         'relative px-3 py-1.5 rounded-full text-sm transition-colors',
+        'duration-300 [transition-timing-function:var(--ease-expo-out)]',
         isActive ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground',
       )}
     >
@@ -58,6 +66,22 @@ function NavLink({ href, children, mobile = false, onClick }: {
   )
 }
 
+/* ── Full-screen mobile menu overlay ── */
+const OVERLAY_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+  exit:   { opacity: 0, transition: { duration: 0.2 } },
+}
+
+const LINK_VARIANTS = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.08 + i * 0.055, type: 'spring' as const, stiffness: 400, damping: 32 },
+  }),
+}
+
 export default function NavBar() {
   const { user, logout, isAdmin, isPM, isHydrated } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -68,9 +92,9 @@ export default function NavBar() {
 
   if (!user && isHydrated) return null
   if (!isHydrated) return (
-    <nav className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-14" />
-    </nav>
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-3rem)] max-w-[860px]">
+      <div className="glass rounded-full border border-border/60 shadow-lg h-14" />
+    </div>
   )
 
   const badgeCount = isAdmin
@@ -79,127 +103,169 @@ export default function NavBar() {
 
   const closeMenu = () => setMenuOpen(false)
 
+  const navItems = [
+    { href: '/employees', label: '직원' },
+    { href: '/projects', label: '프로젝트' },
+    ...((isAdmin || isPM) ? [{ href: '/pm/staffing', label: '인력 요청' }] : []),
+    ...(isAdmin ? [
+      { href: '/admin/allocations', label: '할당' },
+      { href: '/admin/skills', label: '스킬' },
+      { href: '/admin/dashboard', label: '대시보드' },
+    ] : []),
+  ]
+
   return (
     <>
-      <nav className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          {/* Main row */}
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-6">
-              <Link
-                href="/employees"
-                className="flex items-center gap-2 font-semibold text-foreground"
-                onClick={closeMenu}
-              >
-                <UsersThree className="h-5 w-5 text-accent" weight="duotone" />
-                Workforce
-              </Link>
-              {/* Desktop nav links */}
-              <div className="hidden sm:flex items-center gap-1">
-                <NavLink href="/employees">직원</NavLink>
-                <NavLink href="/projects">프로젝트</NavLink>
-                {(isAdmin || isPM) && (
-                  <NavLink href="/pm/staffing">인력 요청</NavLink>
-                )}
-                {isAdmin && (
-                  <>
-                    <NavLink href="/admin/allocations">할당</NavLink>
-                    <NavLink href="/admin/skills">스킬</NavLink>
-                    <NavLink href="/admin/dashboard">대시보드</NavLink>
-                  </>
-                )}
-              </div>
-            </div>
+      {/* ── Floating island nav pill ── */}
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-3rem)] max-w-[860px]">
+        <div className="glass rounded-full border border-border/60 shadow-xl px-4 sm:px-5 h-14 flex items-center justify-between gap-3">
+          {/* Logo */}
+          <Link
+            href="/employees"
+            className="flex items-center gap-2 font-semibold text-foreground shrink-0"
+            onClick={closeMenu}
+          >
+            <UsersThree className="h-5 w-5 text-accent" weight="duotone" />
+            <span className="hidden sm:inline">Workforce</span>
+          </Link>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="relative flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-2.5 rounded-[var(--radius-md)] hover:bg-muted"
-              >
-                <ListChecks className="h-4 w-4" />
-                <span className="hidden sm:inline">업무</span>
-                {badgeCount > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1.5 -right-1.5 h-4 min-w-[16px] px-1 flex items-center justify-center">
-                    {badgeCount}
-                  </Badge>
-                )}
-              </button>
-              <Link href="/me" onClick={closeMenu}>
-                <motion.div
-                  className={cn('rounded-full', badgeCount > 0 && 'animate-pulse-ring')}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                >
-                  <Avatar name={user!.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
-                </motion.div>
-              </Link>
-              <motion.button
-                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                aria-label={resolvedTheme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-                whileTap={{ rotate: 15, scale: 0.9 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className="text-muted-foreground hover:text-foreground transition-colors p-2.5 rounded-[var(--radius-sm)] hover:bg-muted"
-              >
-                {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </motion.button>
-              <button
-                onClick={logout}
-                aria-label="로그아웃"
-                className="hidden sm:flex text-muted-foreground hover:text-destructive transition-colors p-2.5 rounded-[var(--radius-sm)]"
-              >
-                <SignOut className="h-4 w-4" />
-              </button>
-              {/* Mobile hamburger */}
-              <button
-                onClick={() => setMenuOpen(o => !o)}
-                aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
-                aria-expanded={menuOpen}
-                className="sm:hidden p-2.5 text-muted-foreground hover:text-foreground transition-colors rounded-[var(--radius-md)] hover:bg-muted"
-              >
-                {menuOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
-              </button>
-            </div>
+          {/* Desktop nav links */}
+          <div className="hidden sm:flex items-center gap-0.5 flex-1 justify-center">
+            {navItems.map(item => (
+              <NavLink key={item.href} href={item.href}>{item.label}</NavLink>
+            ))}
           </div>
 
-          {/* Mobile dropdown menu — AnimatePresence */}
-          <AnimatePresence>
-            {menuOpen && (
+          {/* Right-side actions */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Tasks button */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="relative flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-2 rounded-full hover:bg-muted/80"
+            >
+              <ListChecks className="h-4 w-4" />
+              <span className="hidden sm:inline text-sm">업무</span>
+              {badgeCount > 0 && (
+                <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 flex items-center justify-center">
+                  {badgeCount}
+                </Badge>
+              )}
+            </button>
+
+            {/* Avatar */}
+            <Link href="/me" onClick={closeMenu}>
               <motion.div
-                key="mobile-menu"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                className="sm:hidden overflow-hidden border-t border-border"
+                className={cn('rounded-full', badgeCount > 0 && 'animate-pulse-ring')}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               >
-                <div className="py-2 flex flex-col gap-0.5">
-                  <NavLink href="/employees" mobile onClick={closeMenu}>직원</NavLink>
-                  <NavLink href="/projects" mobile onClick={closeMenu}>프로젝트</NavLink>
-                  {(isAdmin || isPM) && (
-                    <NavLink href="/pm/staffing" mobile onClick={closeMenu}>인력 요청</NavLink>
-                  )}
-                  {isAdmin && (
-                    <>
-                      <NavLink href="/admin/allocations" mobile onClick={closeMenu}>할당</NavLink>
-                      <NavLink href="/admin/skills" mobile onClick={closeMenu}>스킬</NavLink>
-                      <NavLink href="/admin/dashboard" mobile onClick={closeMenu}>대시보드</NavLink>
-                    </>
-                  )}
-                  <div className="border-t border-border mt-2 pt-2">
-                    <button
-                      onClick={() => { logout(); closeMenu() }}
-                      className="flex items-center gap-2 w-full px-3 py-3 text-sm text-muted-foreground hover:text-destructive hover:bg-muted rounded-[var(--radius-md)] transition-colors"
-                    >
-                      <SignOut className="h-4 w-4" />
-                      로그아웃
-                    </button>
-                  </div>
-                </div>
+                <Avatar
+                  name={user!.email}
+                  size="sm"
+                  className="cursor-pointer hover:ring-2 hover:ring-accent transition-all"
+                />
               </motion.div>
-            )}
-          </AnimatePresence>
+            </Link>
+
+            {/* Theme toggle */}
+            <motion.button
+              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+              aria-label={resolvedTheme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+              whileTap={{ rotate: 20, scale: 0.88 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+              className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-muted/80"
+            >
+              {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </motion.button>
+
+            {/* Logout — desktop only */}
+            <button
+              onClick={logout}
+              aria-label="로그아웃"
+              className="hidden sm:flex text-muted-foreground hover:text-destructive transition-colors p-2 rounded-full hover:bg-muted/80"
+            >
+              <SignOut className="h-4 w-4" />
+            </button>
+
+            {/* Mobile hamburger */}
+            <motion.button
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={menuOpen}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              className="sm:hidden p-2.5 text-foreground rounded-full hover:bg-muted/80 transition-colors"
+            >
+              <HamburgerIcon open={menuOpen} />
+            </motion.button>
+          </div>
         </div>
-      </nav>
+      </div>
+
+      {/* ── Full-screen mobile overlay ── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            key="mobile-overlay"
+            variants={OVERLAY_VARIANTS}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-20 sm:hidden"
+            style={{
+              background: 'color-mix(in srgb, var(--background) 88%, transparent)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+            }}
+          >
+            {/* Close tap outside */}
+            <div className="absolute inset-0" onClick={closeMenu} />
+
+            {/* Nav links — centered, staggered */}
+            <div className="relative flex flex-col items-center justify-center min-h-[100dvh] gap-2 px-8">
+              {navItems.map((item, i) => (
+                <motion.div
+                  key={item.href}
+                  custom={i}
+                  variants={LINK_VARIANTS}
+                  initial="hidden"
+                  animate="visible"
+                  className="w-full max-w-xs"
+                >
+                  <NavLink href={item.href} onClick={closeMenu}>
+                    <span className="text-2xl font-semibold">{item.label}</span>
+                  </NavLink>
+                </motion.div>
+              ))}
+
+              {/* Divider actions */}
+              <motion.div
+                custom={navItems.length}
+                variants={LINK_VARIANTS}
+                initial="hidden"
+                animate="visible"
+                className="flex items-center gap-4 mt-6 pt-6 border-t border-border/50 w-full max-w-xs justify-center"
+              >
+                <motion.button
+                  onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                  whileTap={{ scale: 0.92 }}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors p-3 rounded-full hover:bg-muted/80"
+                >
+                  {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                </motion.button>
+                <button
+                  onClick={() => { logout(); closeMenu() }}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-destructive transition-colors p-3 rounded-full hover:bg-muted/80"
+                >
+                  <SignOut className="h-5 w-5" />
+                </button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <SidebarPanel open={sidebarOpen} onClose={() => setSidebarOpen(false)} isAdmin={isAdmin} />
     </>
   )
