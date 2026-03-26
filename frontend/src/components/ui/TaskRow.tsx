@@ -22,7 +22,7 @@ export default function TaskRow({ task, onClick }: Props) {
       <div className="w-20"><ProgressBar value={statusToProgress(task.status)} size="sm" /></div>
       {task.dueDate && (
         isOverdue ? (
-          <Badge variant="danger" className="gap-1">
+          <Badge variant="destructive" className="gap-1">
             <Warning className="h-3 w-3" weight="bold" />{task.dueDate}
           </Badge>
         ) : (

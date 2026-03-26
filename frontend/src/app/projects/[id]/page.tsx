@@ -32,12 +32,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <PageTransition>
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0 space-y-6">
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
+                <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{project.name}</h1>
                 <Badge variant={STATUS_VARIANT[project.status]}>{STATUS_LABEL[project.status] ?? project.status}</Badge>
               </div>
               {project.description && <p className="text-sm text-muted-foreground mt-1">{project.description}</p>}

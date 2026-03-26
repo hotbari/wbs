@@ -15,6 +15,8 @@ interface ProjectAssignmentRepository : JpaRepository<ProjectAssignment, UUID> {
 
     fun findByEmployeeId(employeeId: UUID): List<ProjectAssignment>
 
+    fun findByProjectIdAndIsActive(projectId: UUID, isActive: Boolean): List<ProjectAssignment>
+
     @Query("""
         SELECT pa FROM ProjectAssignment pa WHERE
         (:employeeId IS NULL OR pa.employeeId = :employeeId)

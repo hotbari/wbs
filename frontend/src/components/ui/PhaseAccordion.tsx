@@ -18,7 +18,7 @@ export default function PhaseAccordion({ phase, onTaskClick, adminActions }: Pro
   return (
     <div className="border border-border rounded-[var(--radius-xl)] overflow-hidden mb-3">
       <button
-        className="w-full flex items-center justify-between px-4 py-3 bg-muted hover:bg-zinc-100 text-left transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted hover:bg-muted/80 text-left transition-colors"
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
       >

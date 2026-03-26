@@ -20,7 +20,7 @@ export function useAuth() {
     const u: AuthUser = {
       id: data.user.id,
       email: data.user.email,
-      role: data.user.role === 'ADMIN' ? 'ADMIN' : 'EMPLOYEE',
+      role: data.user.role as AuthUser['role'],
       employeeId: data.user.employeeId,
     }
     storeUser(u)
@@ -35,5 +35,5 @@ export function useAuth() {
     router.push('/login')
   }
 
-  return { user, login, logout, isAdmin: user?.role === 'ADMIN', isHydrated }
+  return { user, login, logout, isAdmin: user?.role === 'ADMIN', isPM: user?.role === 'PM', isHydrated }
 }

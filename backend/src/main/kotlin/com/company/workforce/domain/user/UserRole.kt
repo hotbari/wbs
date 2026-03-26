@@ -1,3 +1,3 @@
 package com.company.workforce.domain.user
 
-enum class UserRole { ADMIN, EMPLOYEE }
+enum class UserRole { ADMIN, PM, EMPLOYEE }

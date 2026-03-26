@@ -10,6 +10,8 @@ import com.company.workforce.domain.allocation.ProjectAssignment
 import com.company.workforce.domain.allocation.ProjectAssignmentRepository
 import com.company.workforce.domain.employee.EmployeeRepository
 import com.company.workforce.domain.project.ProjectRepository
+import com.company.workforce.infrastructure.email.EmailService
+import org.slf4j.LoggerFactory
 import org.springframework.dao.CannotSerializeTransactionException
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -21,8 +23,11 @@ import java.util.UUID
 class AllocationService(
     private val assignmentRepository: ProjectAssignmentRepository,
     private val employeeRepository: EmployeeRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val emailService: EmailService
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @Transactional(isolation = Isolation.SERIALIZABLE)
     fun create(request: CreateAllocationRequest): AllocationResponse {
         try {
@@ -41,7 +46,7 @@ class AllocationService(
                     "Would exceed 100% allocation (current: $currentTotal%, requested: ${request.allocationPercent}%)"
                 )
 
-            return assignmentRepository.save(
+            val saved = assignmentRepository.save(
                 ProjectAssignment(
                     employeeId = request.employeeId,
                     projectName = request.projectName,
@@ -51,7 +56,26 @@ class AllocationService(
                     startDate = request.startDate,
                     endDate = request.endDate
                 )
-            ).toResponse()
+            )
+
+            // Fire assignment confirmation email — failure must not roll back the allocation
+            try {
+                val employee = employeeRepository.findById(request.employeeId).orElse(null)
+                employee?.let {
+                    emailService.sendAssignmentConfirmation(
+                        toEmail = it.email,
+                        fullName = it.fullName,
+                        projectName = request.projectName,
+                        roleInProject = request.roleInProject,
+                        allocationPercent = request.allocationPercent,
+                        startDate = request.startDate
+                    )
+                }
+            } catch (e: Exception) {
+                log.warn("Failed to send assignment confirmation email: {}", e.message)
+            }
+
+            return saved.toResponse()
         } catch (e: CannotSerializeTransactionException) {
             throw ConflictException("Concurrent allocation conflict — please retry")
         }

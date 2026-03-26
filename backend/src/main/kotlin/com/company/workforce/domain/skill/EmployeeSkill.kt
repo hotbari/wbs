@@ -3,6 +3,8 @@ package com.company.workforce.domain.skill
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcType
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 @Entity
@@ -15,5 +17,7 @@ class EmployeeSkill(
     @JdbcType(PostgreSQLEnumJdbcType::class)
     var proficiency: Proficiency,
     var certified: Boolean = false,
-    var note: String? = null
+    var note: String? = null,
+    var updatedAt: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC),
+    var updatedById: UUID? = null
 )

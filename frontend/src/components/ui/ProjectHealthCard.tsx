@@ -9,7 +9,7 @@ export default function ProjectHealthCard({ health }: { health: ProjectHealth })
         <CardBody className="space-y-2">
           <div className="flex justify-between items-start">
             <span className="font-medium text-sm">{health.name}</span>
-            <Badge variant={health.overdueTaskCount > 0 ? 'danger' : 'success'}>
+            <Badge variant={health.overdueTaskCount > 0 ? 'destructive' : 'success'}>
               {health.overdueTaskCount > 0 ? `${health.overdueTaskCount} overdue` : 'on track'}
             </Badge>
           </div>

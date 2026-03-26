@@ -8,8 +8,12 @@ import java.util.UUID
 class ShareController(private val shareService: ShareService) {
 
     @PostMapping("/api/employees/{id}/share")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PM')")
     fun createShareLink(@PathVariable id: UUID) = shareService.createShareLink(id)
+
+    @PostMapping("/api/projects/{id}/share")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PM')")
+    fun createProjectShareLink(@PathVariable id: UUID) = shareService.createProjectShareLink(id)
 
     @GetMapping("/api/share/{token}")
     fun getSharedView(@PathVariable token: UUID) = shareService.resolveToken(token)

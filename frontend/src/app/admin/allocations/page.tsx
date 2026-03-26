@@ -2,6 +2,17 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AdminGuard from '@/components/guards/AdminGuard'
+
+function endDateCell(endDate: string | null) {
+  if (!endDate) return <span className="text-muted-foreground">진행 중</span>
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const end = new Date(endDate)
+  const diffDays = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  if (diffDays < 0) return <Badge variant="destructive">만료됨</Badge>
+  if (diffDays <= 14) return <Badge variant="warning">{diffDays}일 남음</Badge>
+  return <span>{endDate}</span>
+}
 import AllocationForm from '@/components/forms/AllocationForm'
 import { useAllocations, useCreateAllocation, useDeactivateAllocation } from '@/lib/hooks/useAllocations'
 import { Card, CardBody, Button, Badge, EmptyState, PageTransition } from '@/components/ui/primitives'
@@ -20,7 +31,7 @@ export default function AllocationsPage() {
       <PageTransition>
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold tracking-tight">배정 관리</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">배정 관리</h1>
             <Button onClick={() => setShowForm(s => !s)} variant={showForm ? 'secondary' : 'primary'}>
               {showForm ? '취소' : <><Plus className="h-4 w-4" />배정 추가</>}
             </Button>
@@ -54,30 +65,30 @@ export default function AllocationsPage() {
                     <tr className="border-b border-border">
                       <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">직원</th>
                       <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">프로젝트</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">역할</th>
+                      <th className="hidden md:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">역할</th>
                       <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">%</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">시작일</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">종료일</th>
+                      <th className="hidden lg:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">시작일</th>
+                      <th className="hidden lg:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">종료일</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {data?.data.map(a => (
                       <tr key={a.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-4 text-xs text-muted-foreground">{a.employeeId.slice(0, 8)}...</td>
-                        <td className="py-3 px-4">{a.projectName}</td>
-                        <td className="py-3 px-4 text-muted-foreground">{a.roleInProject}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{a.employeeName ?? a.employeeId.slice(0, 8)}</td>
+                        <td className="py-3 px-4 text-sm">{a.projectName}</td>
+                        <td className="hidden md:table-cell py-3 px-4 text-sm text-muted-foreground">{a.roleInProject}</td>
                         <td className="py-3 px-4">
-                          <Badge variant={a.allocationPercent >= 90 ? 'danger' : a.allocationPercent >= 70 ? 'warning' : 'success'}>
+                          <Badge variant={a.allocationPercent >= 90 ? 'destructive' : a.allocationPercent >= 70 ? 'warning' : 'success'}>
                             {a.allocationPercent}%
                           </Badge>
                         </td>
-                        <td className="py-3 px-4">{a.startDate}</td>
-                        <td className="py-3 px-4">{a.endDate ?? '진행 중'}</td>
+                        <td className="hidden lg:table-cell py-3 px-4 text-sm">{a.startDate}</td>
+                        <td className="hidden lg:table-cell py-3 px-4 text-sm">{endDateCell(a.endDate)}</td>
                         <td className="py-3 px-4">
                           <Button variant="ghost" size="sm" onClick={() => deactivate(a.id)}
                             className="text-destructive hover:text-destructive hover:bg-destructive-light">
-                            <Prohibit className="h-3.5 w-3.5" />비활성화
+                            <Prohibit className="h-3.5 w-3.5" /><span className="hidden sm:inline">비활성화</span>
                           </Button>
                         </td>
                       </tr>

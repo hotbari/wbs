@@ -9,6 +9,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, error, children, ...props }, ref) => (
     <select
       ref={ref}
+      aria-invalid={error || undefined}
       className={cn(
         'flex h-9 w-full rounded-[var(--radius-md)] border bg-card px-3 py-1.5 text-sm',
         'transition-colors',

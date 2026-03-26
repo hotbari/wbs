@@ -9,6 +9,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, error, ...props }, ref) => (
     <textarea
       ref={ref}
+      aria-invalid={error || undefined}
       className={cn(
         'flex w-full rounded-[var(--radius-md)] border bg-card px-3 py-2 text-sm',
         'transition-colors placeholder:text-muted-foreground resize-none',

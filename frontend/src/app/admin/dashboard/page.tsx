@@ -22,17 +22,17 @@ export default function DashboardPage() {
     <AdminGuard>
       <PageTransition>
         <div className="space-y-8">
-          <h1 className="text-2xl font-semibold tracking-tight">대시보드</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">대시보드</h1>
           {isLoading ? <DashboardSkeleton /> : data ? (
             <>
-              <StaggerList className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StaggerList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StaggerItem>
                   <Card><CardBody>
                     <div className="flex items-center gap-2 mb-2">
                       <Users className="h-4 w-4 text-accent" weight="duotone" />
                       <span className="text-sm text-muted-foreground">활성 직원</span>
                     </div>
-                    <p className="text-3xl font-bold">{data.totalActiveEmployees}</p>
+                    <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter">{data.totalActiveEmployees}</p>
                   </CardBody></Card>
                 </StaggerItem>
                 <StaggerItem>
@@ -41,7 +41,7 @@ export default function DashboardPage() {
                       <ChartBar className="h-4 w-4 text-accent" weight="duotone" />
                       <span className="text-sm text-muted-foreground">평균 할당률</span>
                     </div>
-                    <p className="text-3xl font-bold mb-2">{Math.round(data.avgAllocationPercent)}%</p>
+                    <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter mb-2">{Math.round(data.avgAllocationPercent)}%</p>
                     <ProgressBar value={data.avgAllocationPercent} />
                   </CardBody></Card>
                 </StaggerItem>
@@ -51,7 +51,7 @@ export default function DashboardPage() {
                       <UserCircle className="h-4 w-4 text-accent" weight="duotone" />
                       <span className="text-sm text-muted-foreground">여유 인력</span>
                     </div>
-                    <p className="text-3xl font-bold">{data.availableEmployees.length}</p>
+                    <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter">{data.availableEmployees.length}</p>
                   </CardBody></Card>
                 </StaggerItem>
                 <StaggerItem>
@@ -60,7 +60,7 @@ export default function DashboardPage() {
                       <TrendUp className="h-4 w-4 text-warning" weight="duotone" />
                       <span className="text-sm text-muted-foreground">과할당</span>
                     </div>
-                    <p className="text-3xl font-bold">{data.topOverAllocated.length}</p>
+                    <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter">{data.topOverAllocated.length}</p>
                   </CardBody></Card>
                 </StaggerItem>
               </StaggerList>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
                         >
                           <span className="text-sm font-medium w-40 truncate">{employee.fullName}</span>
                           <div className="flex-1"><ProgressBar value={allocationPercent} /></div>
-                          <span className={`text-sm w-12 text-right font-medium ${
+                          <span className={`text-sm w-12 text-right font-medium font-mono tabular-nums ${
                             isOver ? 'text-destructive' : isWarn ? 'text-warning' : 'text-muted-foreground'
                           }`}>
                             {allocationPercent}%

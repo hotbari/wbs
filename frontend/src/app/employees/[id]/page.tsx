@@ -2,6 +2,7 @@
 import { useEmployee } from '@/lib/hooks/useEmployees'
 import { useEmployeeTasks } from '@/lib/hooks/useEmployeeTasks'
 import SkillBadge from '@/components/ui/SkillBadge'
+import SkillFreshnessBadge from '@/components/ui/SkillFreshnessBadge'
 import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
 import Link from 'next/link'
 import { use, useState, useRef, useEffect } from 'react'
@@ -11,7 +12,8 @@ import { PencilSimple, ShareNetwork } from '@phosphor-icons/react'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createShareLink } from '@/lib/api/share'
-import { getEmployeeAvailability } from '@/lib/api/employees'
+import { getEmployeeAvailability, listEmployeeSkills } from '@/lib/api/employees'
+import { useSkillList } from '@/lib/hooks/useSkills'
 
 function DetailSkeleton() {
   return (
@@ -30,6 +32,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     queryKey: ['availability', id],
     queryFn: () => getEmployeeAvailability(id),
   })
+  const { data: employeeSkills = [] } = useQuery({
+    queryKey: ['employees', id, 'skills'],
+    queryFn: () => listEmployeeSkills(id),
+  })
+  const { data: skillCatalog = [] } = useSkillList()
+  const skillNameMap = Object.fromEntries(skillCatalog.map((s: { id: string; name: string }) => [s.id, s.name]))
   const { isAdmin } = useAuth()
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -64,7 +72,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <div className="flex items-center gap-4">
             <Avatar name={employee.fullName} size="lg" />
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{employee.fullName}</h1>
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{employee.fullName}</h1>
               <p className="text-muted-foreground">{employee.jobTitle} · {employee.department}</p>
             </div>
           </div>
@@ -131,13 +139,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </Card>
         )}
 
-        {employee.skills.length > 0 && (
+        {employeeSkills.length > 0 && (
           <Card>
             <CardBody className="space-y-3">
               <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">스킬</h2>
               <div className="flex flex-wrap gap-2">
-                {employee.skills.map((es: EmployeeSkill) => (
-                  <SkillBadge key={es.id} name={es.skillId} proficiency={es.proficiency as Proficiency} />
+                {employeeSkills.map((es: EmployeeSkill) => (
+                  <div key={es.id} className="flex flex-col items-start gap-0.5">
+                    <SkillBadge name={skillNameMap[es.skillId] ?? es.skillId} proficiency={es.proficiency as Proficiency} />
+                    {es.updatedAt && <SkillFreshnessBadge updatedAt={es.updatedAt} />}
+                  </div>
                 ))}
               </div>
             </CardBody>

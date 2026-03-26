@@ -3,9 +3,9 @@ import { cn } from '@/lib/utils'
 const variants = {
   default: 'bg-muted text-muted-foreground',
   success: 'bg-success-light text-accent-dark',
-  warning: 'bg-warning-light text-amber-700',
-  danger: 'bg-destructive-light text-destructive',
-  info: 'bg-info-light text-blue-700',
+  warning: 'bg-warning-light text-warning-foreground',
+  destructive: 'bg-destructive-light text-destructive',
+  info: 'bg-info-light text-info-foreground',
 } as const
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {

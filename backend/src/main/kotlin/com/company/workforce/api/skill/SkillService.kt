@@ -5,6 +5,7 @@ import com.company.workforce.api.common.ForbiddenException
 import com.company.workforce.api.common.NotFoundException
 import com.company.workforce.api.skill.dto.CreateSkillRequest
 import com.company.workforce.api.skill.dto.EmployeeSkillRequest
+import com.company.workforce.api.skill.dto.EmployeeSkillResponse
 import com.company.workforce.api.skill.dto.SkillResponse
 import com.company.workforce.domain.employee.EmployeeRepository
 import com.company.workforce.domain.skill.EmployeeSkill
@@ -15,9 +16,16 @@ import com.company.workforce.domain.user.User
 import com.company.workforce.domain.user.UserRole
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 private fun Skill.toResponse() = SkillResponse(id = id, name = name, category = category, description = description)
+
+private fun EmployeeSkill.toResponse() = EmployeeSkillResponse(
+    id = id, skillId = skillId, proficiency = proficiency.name,
+    certified = certified, note = note, updatedAt = updatedAt
+)
 
 @Service
 @Transactional
@@ -58,29 +66,33 @@ class SkillService(
     }
 
     @Transactional(readOnly = true)
-    fun getEmployeeSkills(employeeId: UUID): List<EmployeeSkill> =
-        employeeSkillRepository.findByEmployeeId(employeeId)
+    fun getEmployeeSkills(employeeId: UUID): List<EmployeeSkillResponse> =
+        employeeSkillRepository.findByEmployeeId(employeeId).map { it.toResponse() }
 
-    fun addSkillToEmployee(employeeId: UUID, request: EmployeeSkillRequest, caller: User): EmployeeSkill {
+    fun addSkillToEmployee(employeeId: UUID, request: EmployeeSkillRequest, caller: User): EmployeeSkillResponse {
         assertCanEditEmployee(employeeId, caller)
         if (!employeeRepository.existsById(employeeId)) throw NotFoundException("Employee not found")
         if (!skillRepository.existsById(request.skillId)) throw NotFoundException("Skill not found")
         if (employeeSkillRepository.existsByEmployeeIdAndSkillId(employeeId, request.skillId))
             throw ConflictException("Skill already assigned")
+        val now = LocalDateTime.now(ZoneOffset.UTC)
         return employeeSkillRepository.save(EmployeeSkill(
             employeeId = employeeId, skillId = request.skillId,
-            proficiency = request.proficiency, certified = request.certified ?: false, note = request.note
-        )).also { touchSkillsUpdated(employeeId) }
+            proficiency = request.proficiency, certified = request.certified ?: false, note = request.note,
+            updatedAt = now, updatedById = caller.id
+        )).also { touchSkillsUpdated(employeeId) }.toResponse()
     }
 
-    fun updateEmployeeSkill(employeeId: UUID, skillId: UUID, request: EmployeeSkillRequest, caller: User): EmployeeSkill {
+    fun updateEmployeeSkill(employeeId: UUID, skillId: UUID, request: EmployeeSkillRequest, caller: User): EmployeeSkillResponse {
         assertCanEditEmployee(employeeId, caller)
         val es = employeeSkillRepository.findByEmployeeIdAndSkillId(employeeId, skillId)
             ?: throw NotFoundException("Skill not assigned")
         es.proficiency = request.proficiency
         request.certified?.let { es.certified = it }
         request.note?.let { es.note = it }
-        return employeeSkillRepository.save(es).also { touchSkillsUpdated(employeeId) }
+        es.updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+        es.updatedById = caller.id
+        return employeeSkillRepository.save(es).also { touchSkillsUpdated(employeeId) }.toResponse()
     }
 
     fun removeEmployeeSkill(employeeId: UUID, skillId: UUID, caller: User) {
@@ -104,6 +116,7 @@ class SkillService(
         employeeSkillRepository.flush()
 
         // Phase 2: insert new assignments only where employee didn't already have target skill
+        val now = LocalDateTime.now(ZoneOffset.UTC)
         val toInsert = sourceAssignments
             .filter { it.employeeId !in targetEmployeeIds }
             .map { EmployeeSkill(
@@ -111,7 +124,8 @@ class SkillService(
                 skillId = targetId,
                 proficiency = it.proficiency,
                 certified = it.certified,
-                note = it.note
+                note = it.note,
+                updatedAt = now
             ) }
         employeeSkillRepository.saveAll(toInsert)
 
@@ -125,7 +139,7 @@ class SkillService(
 
     private fun touchSkillsUpdated(employeeId: UUID) {
         val employee = employeeRepository.findById(employeeId).orElse(null) ?: return
-        employee.skillsLastUpdatedAt = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC)
+        employee.skillsLastUpdatedAt = LocalDateTime.now(ZoneOffset.UTC)
         employeeRepository.save(employee)
     }
 

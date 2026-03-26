@@ -61,7 +61,7 @@ export default function LoginPage() {
         <div className="text-white text-center max-w-md">
           <UsersThree className="h-16 w-16 mx-auto mb-6 opacity-90" weight="duotone" />
           <h2 className="text-3xl font-bold mb-3">인력 배치 관리</h2>
-          <p className="text-emerald-100 text-lg">팀의 역량, 스킬, 프로젝트 배정을 한 곳에서 관리하세요.</p>
+          <p className="text-accent-light text-lg">팀의 역량, 스킬, 프로젝트 배정을 한 곳에서 관리하세요.</p>
         </div>
       </div>
     </div>

@@ -82,7 +82,7 @@ class EmployeeService(
             User(
                 email = request.email,
                 passwordHash = passwordEncoder.encode(request.password),
-                role = UserRole.EMPLOYEE,
+                role = request.role,
                 employeeId = employee.id
             )
         )

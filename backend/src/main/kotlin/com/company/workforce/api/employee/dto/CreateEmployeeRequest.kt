@@ -1,6 +1,7 @@
 package com.company.workforce.api.employee.dto
 
 import com.company.workforce.domain.employee.EmploymentType
+import com.company.workforce.domain.user.UserRole
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -17,5 +18,6 @@ data class CreateEmployeeRequest(
     @field:NotBlank @field:Size(max = 100) val jobTitle: String,
     val grade: String? = null,
     val employmentType: EmploymentType,
-    val hiredAt: LocalDate
+    val hiredAt: LocalDate,
+    val role: UserRole = UserRole.EMPLOYEE
 )

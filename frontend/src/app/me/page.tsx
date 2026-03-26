@@ -3,8 +3,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { useEmployee } from '@/lib/hooks/useEmployees'
 import { useEmployeeTasks } from '@/lib/hooks/useEmployeeTasks'
 import EmployeeTaskList from '@/components/ui/EmployeeTaskList'
-import SkillBadge from '@/components/ui/SkillBadge'
-import type { EmployeeSkill, Proficiency } from '@/lib/types'
+import SkillEditPanel from '@/components/ui/SkillEditPanel'
 import { Avatar, Card, CardBody, Button, Input, ProgressBar, Skeleton, SkeletonCircle, PageTransition } from '@/components/ui/primitives'
 import { useState } from 'react'
 
@@ -34,13 +33,13 @@ export default function MePage() {
         <div className="flex items-center gap-4">
           <Avatar name={employee.fullName} size="lg" />
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{employee.fullName}</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{employee.fullName}</h1>
             <p className="text-muted-foreground">{employee.jobTitle} · {employee.team ?? employee.department}</p>
             <p className="text-sm text-muted-foreground">{employee.email}</p>
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1 space-y-4">
             <Card>
               <CardBody className="space-y-3">
@@ -82,11 +81,11 @@ export default function MePage() {
             </Card>
           </div>
 
-          <div className="w-56 shrink-0 space-y-4">
+          <div className="w-full md:w-56 shrink-0 space-y-4">
             <Card>
               <CardBody className="space-y-2">
                 <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">할당률</h3>
-                <p className="text-3xl font-bold">{employee.totalAllocationPercent}%</p>
+                <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter">{employee.totalAllocationPercent}%</p>
                 <ProgressBar value={employee.totalAllocationPercent} />
                 {employee.assignments.length > 0 && (
                   <div className="space-y-1 mt-2">
@@ -114,18 +113,7 @@ export default function MePage() {
               </CardBody>
             </Card>
 
-            {employee.skills.length > 0 && (
-              <Card>
-                <CardBody className="space-y-2">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">스킬</h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {employee.skills.map((es: EmployeeSkill) => (
-                      <SkillBadge key={es.id} name={es.skillId} proficiency={es.proficiency as Proficiency} />
-                    ))}
-                  </div>
-                </CardBody>
-              </Card>
-            )}
+            <SkillEditPanel employeeId={user?.employeeId} />
           </div>
         </div>
       </div>

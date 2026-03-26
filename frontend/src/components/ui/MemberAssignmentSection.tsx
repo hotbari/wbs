@@ -11,16 +11,16 @@ import SkillBadge from '@/components/ui/SkillBadge'
 import type { Proficiency } from '@/lib/types'
 
 function allocationColor(percent: number): string {
-  if (percent <= 30) return 'text-emerald-400'
-  if (percent <= 69) return 'text-amber-400'
-  if (percent <= 99) return 'text-orange-400'
+  if (percent <= 30) return 'text-allocation-low'
+  if (percent <= 69) return 'text-allocation-medium'
+  if (percent <= 99) return 'text-allocation-high'
   return 'text-destructive'
 }
 
 function allocationBarColor(percent: number): string {
-  if (percent <= 30) return 'bg-emerald-400'
-  if (percent <= 69) return 'bg-amber-400'
-  if (percent <= 99) return 'bg-orange-400'
+  if (percent <= 30) return 'bg-allocation-low'
+  if (percent <= 69) return 'bg-allocation-medium'
+  if (percent <= 99) return 'bg-allocation-high'
   return 'bg-destructive'
 }
 

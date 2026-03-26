@@ -44,7 +44,7 @@ export default function EmployeesPage() {
   return (
     <PageTransition>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">직원 목록</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">직원 목록</h1>
         {isAdmin && (
           <Link href="/admin/employees/new">
             <Button><Plus className="h-4 w-4" />직원 추가</Button>
@@ -53,20 +53,20 @@ export default function EmployeesPage() {
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6">
-        <div className="relative">
+        <div className="relative w-full sm:w-64">
           <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="이름으로 검색..."
             value={search}
             onChange={e => { setSearch(e.target.value); resetPage() }}
-            className="pl-9 w-64"
+            className="pl-9"
           />
         </div>
         <Input
           placeholder="부서"
           value={department}
           onChange={e => { setDepartment(e.target.value); resetPage() }}
-          className="w-40"
+          className="w-full sm:w-40"
         />
         <SkillFilterPanel
           selectedSkillIds={selectedSkillIds}

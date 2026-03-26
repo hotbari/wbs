@@ -21,7 +21,7 @@ export default function EmployeeCard({ employee }: { employee: EmployeeSummary }
             </div>
           </div>
           <ProgressBar value={employee.totalAllocationPercent} />
-          <p className={`text-xs mt-1.5 ${
+          <p className={`text-xs mt-1.5 font-mono tabular-nums ${
             employee.totalAllocationPercent >= 100 ? 'text-destructive font-medium' :
             employee.totalAllocationPercent >= 80  ? 'text-warning font-medium' :
             'text-muted-foreground'

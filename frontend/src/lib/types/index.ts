@@ -1,4 +1,4 @@
-export type UserRole = 'ADMIN' | 'EMPLOYEE'
+export type UserRole = 'ADMIN' | 'PM' | 'EMPLOYEE'
 export type EmploymentType = 'FULL_TIME' | 'CONTRACT' | 'PART_TIME'
 export type Proficiency = 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT'
 
@@ -49,11 +49,13 @@ export interface EmployeeSkill {
   proficiency: Proficiency
   certified: boolean
   note?: string
+  updatedAt: string
 }
 
 export interface Allocation {
   id: string
   employeeId: string
+  employeeName?: string
   projectId: string | null
   projectName: string
   roleInProject: string
