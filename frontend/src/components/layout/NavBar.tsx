@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { useMyTasks, useProjectHealth } from '@/lib/hooks/useSidebar'
 import { UsersThree, ListChecks, SignOut, List, X, Sun, Moon } from '@phosphor-icons/react'
 import { useTheme } from 'next-themes'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Badge, Avatar } from '@/components/ui/primitives'
 import { cn } from '@/lib/utils'
 import SidebarPanel from '@/components/ui/SidebarPanel'
@@ -40,14 +41,19 @@ function NavLink({ href, children, mobile = false, onClick }: {
     <Link
       href={href}
       className={cn(
-        'relative text-sm transition-colors px-1 py-0.5',
+        'relative px-3 py-1.5 rounded-full text-sm transition-colors',
         isActive ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground',
       )}
     >
-      {children}
       {isActive && (
-        <span className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-accent rounded-full" />
+        <motion.span
+          layoutId="nav-active-pill"
+          className="absolute inset-0 bg-muted rounded-full"
+          style={{ zIndex: -1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+        />
       )}
+      {children}
     </Link>
   )
 }
@@ -89,7 +95,7 @@ export default function NavBar() {
                 Workforce
               </Link>
               {/* Desktop nav links */}
-              <div className="hidden sm:flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-1">
                 <NavLink href="/employees">직원</NavLink>
                 <NavLink href="/projects">프로젝트</NavLink>
                 {(isAdmin || isPM) && (
@@ -119,15 +125,23 @@ export default function NavBar() {
                 )}
               </button>
               <Link href="/me" onClick={closeMenu}>
-                <Avatar name={user!.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
+                <motion.div
+                  className={cn('rounded-full', badgeCount > 0 && 'animate-pulse-ring')}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                >
+                  <Avatar name={user!.email} size="sm" className="cursor-pointer hover:ring-2 hover:ring-accent transition-all" />
+                </motion.div>
               </Link>
-              <button
+              <motion.button
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 aria-label={resolvedTheme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+                whileTap={{ rotate: 15, scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 className="text-muted-foreground hover:text-foreground transition-colors p-2.5 rounded-[var(--radius-sm)] hover:bg-muted"
               >
                 {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </button>
+              </motion.button>
               <button
                 onClick={logout}
                 aria-label="로그아웃"
@@ -147,32 +161,43 @@ export default function NavBar() {
             </div>
           </div>
 
-          {/* Mobile dropdown menu */}
-          {menuOpen && (
-            <div className="sm:hidden border-t border-border py-2 flex flex-col gap-0.5">
-              <NavLink href="/employees" mobile onClick={closeMenu}>직원</NavLink>
-              <NavLink href="/projects" mobile onClick={closeMenu}>프로젝트</NavLink>
-              {(isAdmin || isPM) && (
-                <NavLink href="/pm/staffing" mobile onClick={closeMenu}>인력 요청</NavLink>
-              )}
-              {isAdmin && (
-                <>
-                  <NavLink href="/admin/allocations" mobile onClick={closeMenu}>할당</NavLink>
-                  <NavLink href="/admin/skills" mobile onClick={closeMenu}>스킬</NavLink>
-                  <NavLink href="/admin/dashboard" mobile onClick={closeMenu}>대시보드</NavLink>
-                </>
-              )}
-              <div className="border-t border-border mt-2 pt-2">
-                <button
-                  onClick={() => { logout(); closeMenu() }}
-                  className="flex items-center gap-2 w-full px-3 py-3 text-sm text-muted-foreground hover:text-destructive hover:bg-muted rounded-[var(--radius-md)] transition-colors"
-                >
-                  <SignOut className="h-4 w-4" />
-                  로그아웃
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Mobile dropdown menu — AnimatePresence */}
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                key="mobile-menu"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                className="sm:hidden overflow-hidden border-t border-border"
+              >
+                <div className="py-2 flex flex-col gap-0.5">
+                  <NavLink href="/employees" mobile onClick={closeMenu}>직원</NavLink>
+                  <NavLink href="/projects" mobile onClick={closeMenu}>프로젝트</NavLink>
+                  {(isAdmin || isPM) && (
+                    <NavLink href="/pm/staffing" mobile onClick={closeMenu}>인력 요청</NavLink>
+                  )}
+                  {isAdmin && (
+                    <>
+                      <NavLink href="/admin/allocations" mobile onClick={closeMenu}>할당</NavLink>
+                      <NavLink href="/admin/skills" mobile onClick={closeMenu}>스킬</NavLink>
+                      <NavLink href="/admin/dashboard" mobile onClick={closeMenu}>대시보드</NavLink>
+                    </>
+                  )}
+                  <div className="border-t border-border mt-2 pt-2">
+                    <button
+                      onClick={() => { logout(); closeMenu() }}
+                      className="flex items-center gap-2 w-full px-3 py-3 text-sm text-muted-foreground hover:text-destructive hover:bg-muted rounded-[var(--radius-md)] transition-colors"
+                    >
+                      <SignOut className="h-4 w-4" />
+                      로그아웃
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </nav>
       <SidebarPanel open={sidebarOpen} onClose={() => setSidebarOpen(false)} isAdmin={isAdmin} />
