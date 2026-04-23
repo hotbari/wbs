@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useCallback, useRef, useId } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { spring } from '@/lib/motion/presets'
 import { X } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
@@ -115,7 +116,7 @@ export function Modal({ open, onClose, title, size = 'md', children, className }
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={spring.soft}
           >
             {title && (
               <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">

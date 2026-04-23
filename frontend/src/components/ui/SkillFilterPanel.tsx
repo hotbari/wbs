@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { listSkills } from '@/lib/api/skills'
 import { Funnel, X } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { spring } from '@/lib/motion/presets'
 import type { Skill } from '@/lib/types'
 
 interface Props {
@@ -55,7 +56,7 @@ export default function SkillFilterPanel({ selectedSkillIds, onChange }: Props) 
             initial={{ opacity: 0, scale: 0.95, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -6 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            transition={spring.gentle}
             style={{ transformOrigin: 'top left' }}
             className="absolute top-full left-0 mt-1 z-50 w-64 bg-card border border-border rounded-[var(--radius-lg)] shadow-lg p-2 max-h-64 overflow-y-auto"
           >

@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { fade } from '@/lib/motion/presets'
 import { Input } from '@/components/ui/primitives'
 import type { Skill } from '@/lib/types'
 
@@ -75,7 +76,7 @@ export default function SkillAutocomplete({ skills, exclude, onSelect, placehold
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.12 }}
+            transition={fade.fast}
             className="absolute z-50 w-full mt-1 bg-card border border-border rounded-[var(--radius-md)] shadow-lg max-h-52 overflow-y-auto"
           >
             {filtered.map((skill, i) => (

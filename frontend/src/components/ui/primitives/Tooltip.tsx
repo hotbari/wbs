@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useId, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { fade } from '@/lib/motion/presets'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -74,7 +75,7 @@ export function Tooltip({ content, position = 'top', delay = 300, children }: To
               'shadow-md',
               positionClasses[position],
             )}
-            transition={{ duration: 0.12, ease: 'easeOut' }}
+            transition={fade.fast}
             {...motionProps[position]}
           >
             {content}

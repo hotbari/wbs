@@ -1,5 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
+import { spring } from '@/lib/motion/presets'
 
 interface PageTransitionProps {
   children: React.ReactNode
@@ -11,7 +12,7 @@ export function PageTransition({ children, className }: PageTransitionProps) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={spring.soft}
       className={className}
     >
       {children}
