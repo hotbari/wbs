@@ -2,7 +2,7 @@
 import { use } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getSharedView } from '@/lib/api/share'
-import { Card, CardBody, ProgressBar } from '@/components/ui/primitives'
+import { Card, CardBody, ProgressBar, PageHeader } from '@/components/ui/primitives'
 
 export default function SharePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params)
@@ -28,11 +28,11 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
 
   return (
     <div className="max-w-xl mx-auto px-4 py-12 space-y-6">
-      <div>
-        <p className="text-xs text-muted-foreground mb-1">인력 배정 현황 (읽기 전용)</p>
-        <h1 className="text-2xl font-semibold tracking-tight">{data.fullName}</h1>
-        <p className="text-muted-foreground">{data.jobTitle} · {data.department}</p>
-      </div>
+      <PageHeader
+        eyebrow="읽기 전용 공유"
+        heading={data.fullName}
+        subtitle={`${data.jobTitle} · ${data.department}`}
+      />
 
       <Card>
         <CardBody className="space-y-2">

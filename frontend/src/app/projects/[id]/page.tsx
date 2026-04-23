@@ -5,7 +5,7 @@ import { useProject } from '@/lib/hooks/useProjects'
 import PhaseAccordion from '@/components/ui/PhaseAccordion'
 import TaskDetailDrawer from '@/components/ui/TaskDetailDrawer'
 import type { TaskItem } from '@/lib/types'
-import { Badge, Button, Skeleton, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { Badge, Button, Skeleton, EmptyState, PageTransition, PageHeader } from '@/components/ui/primitives'
 import { PencilSimple, ListDashes } from '@phosphor-icons/react'
 import ProjectMemberPanel from '@/components/ui/ProjectMemberPanel'
 
@@ -34,19 +34,25 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     <PageTransition>
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0 space-y-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{project.name}</h1>
-                <Badge variant={STATUS_VARIANT[project.status]}>{STATUS_LABEL[project.status] ?? project.status}</Badge>
-              </div>
-              {project.description && <p className="text-sm text-muted-foreground mt-1">{project.description}</p>}
-              <p className="text-xs text-muted-foreground mt-1">{project.startDate}{project.endDate ? ` → ${project.endDate}` : ''}</p>
-            </div>
-            <Link href={`/admin/projects/${id}/edit`}>
-              <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />수정</Button>
-            </Link>
-          </div>
+          <PageHeader
+            heading={project.name}
+            headingAppend={
+              <Badge variant={STATUS_VARIANT[project.status]}>
+                {STATUS_LABEL[project.status] ?? project.status}
+              </Badge>
+            }
+            subtitle={
+              <>
+                {project.description && <p>{project.description}</p>}
+                <p>{project.startDate}{project.endDate ? ` → ${project.endDate}` : ''}</p>
+              </>
+            }
+            action={
+              <Link href={`/admin/projects/${id}/edit`}>
+                <Button variant="secondary" size="sm"><PencilSimple className="h-4 w-4" />수정</Button>
+              </Link>
+            }
+          />
 
           <div>
             {project.phases.length === 0 ? (

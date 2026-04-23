@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import PmGuard from '@/components/guards/PmGuard'
 import { useSkillList } from '@/lib/hooks/useSkills'
 import { listAvailableEmployees } from '@/lib/api/employees'
-import { Card, CardBody, Button, Input, Badge, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { Card, CardBody, Button, Input, Badge, EmptyState, PageTransition, PageHeader } from '@/components/ui/primitives'
 import { MagnifyingGlass, UsersThree } from '@phosphor-icons/react'
 import type { EmployeeSummary } from '@/lib/types'
 
@@ -53,7 +53,7 @@ export default function PmStaffingPage() {
     <PmGuard>
       <PageTransition>
         <div className="space-y-6">
-          <h1 className="text-2xl font-semibold tracking-tight">인력 요청</h1>
+          <PageHeader eyebrow="프로젝트 매니저" heading="인력 요청" />
 
           <Card className="max-w-2xl">
             <CardBody className="space-y-4">

@@ -2,9 +2,7 @@
 import { use, useState, useEffect } from 'react'
 import { useEmployee, useUpdateEmployee } from '@/lib/hooks/useEmployees'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Card, CardBody, Input, Button, Skeleton, PageTransition } from '@/components/ui/primitives'
-import { ArrowLeft } from '@phosphor-icons/react'
+import { Card, CardBody, Input, Button, Skeleton, PageTransition, PageHeader } from '@/components/ui/primitives'
 
 export default function EditEmployeePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -39,10 +37,11 @@ export default function EditEmployeePage({ params }: { params: Promise<{ id: str
   return (
     <PageTransition>
       <div className="max-w-md mx-auto">
-        <Link href={`/employees/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-          <ArrowLeft className="h-4 w-4" />프로필로 돌아가기
-        </Link>
-        <h1 className="text-2xl font-semibold tracking-tight mb-6">프로필 수정</h1>
+        <PageHeader
+          eyebrow="프로필"
+          heading="프로필 수정"
+          backTo={{ href: `/employees/${id}`, label: '직원 상세로' }}
+        />
         <Card>
           <CardBody>
             <form onSubmit={handleSubmit} className="space-y-4">

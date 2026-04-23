@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useProjectList } from '@/lib/hooks/useProjects'
 import type { ProjectStatus } from '@/lib/types'
-import { Button, Badge, Card, CardBody, Skeleton, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
+import { Button, Badge, Card, CardBody, Skeleton, EmptyState, PageTransition, StaggerList, StaggerItem, PageHeader } from '@/components/ui/primitives'
 import { Plus, FolderOpen } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
@@ -32,26 +32,32 @@ export default function ProjectsPage() {
 
   return (
     <PageTransition>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">프로젝트</h1>
-        <div className="flex items-center gap-3">
-          <div className="flex bg-muted rounded-[var(--radius-lg)] p-0.5">
-            {filters.map(f => (
-              <button
-                key={f.label}
-                onClick={() => setStatus(f.value)}
-                className={cn(
-                  'px-3 py-1.5 text-sm rounded-[var(--radius-md)] transition-colors',
-                  status === f.value ? 'bg-card text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-          <Link href="/admin/projects/new"><Button><Plus className="h-4 w-4" />새 프로젝트</Button></Link>
-        </div>
-      </div>
+      <PageHeader
+        heading="프로젝트"
+        action={
+          <>
+            <div className="flex bg-muted rounded-[var(--radius-lg)] p-0.5">
+              {filters.map(f => (
+                <button
+                  key={f.label}
+                  onClick={() => setStatus(f.value)}
+                  className={cn(
+                    'px-3 py-1.5 text-sm rounded-[var(--radius-md)] transition-colors',
+                    status === f.value
+                      ? 'bg-card text-foreground shadow-sm font-medium'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <Link href="/admin/projects/new">
+              <Button><Plus className="h-4 w-4" />새 프로젝트</Button>
+            </Link>
+          </>
+        }
+      />
       {isLoading ? (
         <div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)}</div>
       ) : !data?.data.length ? (
