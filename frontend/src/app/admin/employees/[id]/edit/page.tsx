@@ -4,9 +4,7 @@ import AdminGuard from '@/components/guards/AdminGuard'
 import EmployeeForm from '@/components/forms/EmployeeForm'
 import { useEmployee, useUpdateEmployee } from '@/lib/hooks/useEmployees'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Card, CardBody, Skeleton, PageTransition } from '@/components/ui/primitives'
-import { ArrowLeft } from '@phosphor-icons/react'
+import { Card, CardBody, Skeleton, PageTransition, PageHeader } from '@/components/ui/primitives'
 
 export default function AdminEditEmployeePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -24,10 +22,11 @@ export default function AdminEditEmployeePage({ params }: { params: Promise<{ id
     <AdminGuard>
       <PageTransition>
         <div className="max-w-xl mx-auto">
-          <Link href={`/employees/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />프로필로 돌아가기
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">직원 정보 수정</h1>
+          <PageHeader
+            eyebrow="관리자"
+            heading="직원 정보 수정"
+            backTo={{ href: `/employees/${id}`, label: '직원 상세로' }}
+          />
           <Card>
             <CardBody>
               <EmployeeForm

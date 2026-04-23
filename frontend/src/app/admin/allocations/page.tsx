@@ -15,7 +15,7 @@ function endDateCell(endDate: string | null) {
 }
 import AllocationForm from '@/components/forms/AllocationForm'
 import { useAllocations, useCreateAllocation, useDeactivateAllocation } from '@/lib/hooks/useAllocations'
-import { Card, CardBody, Button, Badge, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { Card, CardBody, Button, Badge, EmptyState, PageTransition, PageHeader } from '@/components/ui/primitives'
 import { Plus, Prohibit, ListDashes } from '@phosphor-icons/react'
 
 export default function AllocationsPage() {
@@ -30,12 +30,15 @@ export default function AllocationsPage() {
     <AdminGuard>
       <PageTransition>
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">배정 관리</h1>
-            <Button onClick={() => setShowForm(s => !s)} variant={showForm ? 'secondary' : 'primary'}>
-              {showForm ? '취소' : <><Plus className="h-4 w-4" />배정 추가</>}
-            </Button>
-          </div>
+          <PageHeader
+            eyebrow="관리자"
+            heading="배정 관리"
+            action={
+              <Button onClick={() => setShowForm(s => !s)} variant={showForm ? 'secondary' : 'primary'}>
+                {showForm ? '취소' : <><Plus className="h-4 w-4" />배정 추가</>}
+              </Button>
+            }
+          />
           <AnimatePresence>
             {showForm && (
               <motion.div

@@ -1,11 +1,10 @@
 'use client'
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import AdminGuard from '@/components/guards/AdminGuard'
 import { useProject, useUpdateProject, useCreatePhase, useDeletePhase, useCreateTask } from '@/lib/hooks/useProjects'
-import { Card, CardBody, Input, Button, PageTransition } from '@/components/ui/primitives'
-import { ArrowLeft, Plus, Trash, ListPlus } from '@phosphor-icons/react'
+import { Card, CardBody, Input, Button, PageTransition, PageHeader } from '@/components/ui/primitives'
+import { Plus, Trash, ListPlus } from '@phosphor-icons/react'
 import MemberAssignmentSection from '@/components/ui/MemberAssignmentSection'
 
 export default function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,19 +25,21 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
     <AdminGuard>
       <PageTransition>
         <div className="max-w-2xl space-y-8">
-          <div>
-            <Link href={`/projects/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
-              <ArrowLeft className="h-4 w-4" />프로젝트로 돌아가기
-            </Link>
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-semibold tracking-tight">수정: {project.name}</h1>
-              <Button variant="destructive" size="sm"
+          <PageHeader
+            eyebrow="관리자"
+            heading={`수정: ${project.name}`}
+            backTo={{ href: `/projects/${id}`, label: '프로젝트로 돌아가기' }}
+            action={
+              <Button
+                variant="destructive"
+                size="sm"
                 loading={isPending}
-                onClick={() => update({ status: 'ARCHIVED' }, { onSuccess: () => router.push('/projects') })}>
+                onClick={() => update({ status: 'ARCHIVED' }, { onSuccess: () => router.push('/projects') })}
+              >
                 프로젝트 보관
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           <div>
             <h2 className="label-caps mb-3">페이즈</h2>

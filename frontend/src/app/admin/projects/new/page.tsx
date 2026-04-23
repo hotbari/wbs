@@ -1,11 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import AdminGuard from '@/components/guards/AdminGuard'
 import { useCreateProject } from '@/lib/hooks/useProjects'
-import { Card, CardBody, Input, Textarea, Button, PageTransition } from '@/components/ui/primitives'
-import { ArrowLeft, WarningCircle } from '@phosphor-icons/react'
+import { Card, CardBody, Input, Textarea, Button, PageTransition, PageHeader } from '@/components/ui/primitives'
+import { WarningCircle } from '@phosphor-icons/react'
 
 export default function NewProjectPage() {
   const router = useRouter()
@@ -18,10 +17,11 @@ export default function NewProjectPage() {
     <AdminGuard>
       <PageTransition>
         <div className="max-w-lg">
-          <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />프로젝트 목록으로 돌아가기
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">새 프로젝트</h1>
+          <PageHeader
+            eyebrow="관리자"
+            heading="새 프로젝트"
+            backTo={{ href: '/projects', label: '프로젝트 목록으로' }}
+          />
           <Card>
             <CardBody className="space-y-4">
               <div>

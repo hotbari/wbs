@@ -3,9 +3,7 @@ import AdminGuard from '@/components/guards/AdminGuard'
 import EmployeeForm from '@/components/forms/EmployeeForm'
 import { useCreateEmployee } from '@/lib/hooks/useEmployees'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Card, CardBody, PageTransition } from '@/components/ui/primitives'
-import { ArrowLeft } from '@phosphor-icons/react'
+import { Card, CardBody, PageTransition, PageHeader } from '@/components/ui/primitives'
 
 export default function NewEmployeePage() {
   const { mutate, isPending, error } = useCreateEmployee()
@@ -14,10 +12,11 @@ export default function NewEmployeePage() {
     <AdminGuard>
       <PageTransition>
         <div className="max-w-xl mx-auto">
-          <Link href="/employees" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />직원 목록으로 돌아가기
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">직원 추가</h1>
+          <PageHeader
+            eyebrow="관리자"
+            heading="직원 추가"
+            backTo={{ href: '/employees', label: '직원 목록으로' }}
+          />
           <Card>
             <CardBody>
               <EmployeeForm

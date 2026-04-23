@@ -5,7 +5,7 @@ import { useSkillList, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { mergeSkills } from '@/lib/api/skills'
 import type { Skill } from '@/lib/types'
-import { Card, CardBody, Input, Button, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { Card, CardBody, Input, Button, EmptyState, PageTransition, PageHeader } from '@/components/ui/primitives'
 import { PencilSimple, Trash, Tag, Plus, WarningCircle, ArrowsLeftRight } from '@phosphor-icons/react'
 
 export default function AdminSkillsPage() {
@@ -36,7 +36,7 @@ export default function AdminSkillsPage() {
     <AdminGuard>
       <PageTransition>
         <div className="space-y-6 max-w-2xl">
-          <h1 className="text-2xl font-semibold tracking-tight">스킬 관리</h1>
+          <PageHeader eyebrow="관리자" heading="스킬 관리" />
 
           {mergeSourceId && (
             <div className="border border-warning/40 bg-warning/5 rounded-[var(--radius-lg)] px-4 py-3 text-sm">
