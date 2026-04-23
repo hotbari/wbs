@@ -36,7 +36,7 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
 
       <Card>
         <CardBody className="space-y-2">
-          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <h2 className="label-caps">
             현재 할당률 ({data.totalAllocationPercent}%)
           </h2>
           <ProgressBar value={data.totalAllocationPercent} />
@@ -45,7 +45,7 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
 
       <Card>
         <CardBody className="space-y-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <h2 className="label-caps">
             프로젝트 배정 ({data.allocations.length}건)
           </h2>
           {data.allocations.length === 0 ? (

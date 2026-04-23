@@ -80,8 +80,8 @@ export default function AdminSkillsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">스킬 이름</th>
-                    <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">카테고리</th>
+                    <th className="text-left label-caps py-3 px-4">스킬 이름</th>
+                    <th className="text-left label-caps py-3 px-4">카테고리</th>
                     <th className="py-3 px-4"></th>
                   </tr>
                 </thead>

@@ -19,7 +19,7 @@ export default function EmployeeCard({ employee }: { employee: EmployeeSummary }
                 {employee.fullName}
               </p>
               <p className="text-xs text-muted-foreground truncate mt-0.5">{employee.jobTitle}</p>
-              <span className="mt-1.5 inline-block px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+              <span className="mt-1.5 inline-block px-2 py-0.5 rounded-full bg-muted text-xs font-medium text-muted-foreground">
                 {employee.department}
               </span>
             </div>
@@ -47,7 +47,7 @@ export default function EmployeeCard({ employee }: { employee: EmployeeSummary }
               {employee.topSkills.slice(0, 3).map(s => (
                 <span
                   key={s.skillId}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] bg-accent-light/40 text-[11px] font-medium text-accent-text"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] bg-accent-light/40 text-xs font-medium text-accent-text"
                 >
                   {s.name}
                   <span className="flex gap-0.5 ml-0.5">

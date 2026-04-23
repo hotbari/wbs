@@ -1,3 +1,5 @@
+'use client'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -13,6 +15,12 @@ export function ProgressBar({ value, size = 'md', className, ...props }: Progres
     value >= 50  ? 'bg-allocation-medium' :
     'bg-allocation-low'
 
+  const [displayed, setDisplayed] = useState(0)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setDisplayed(clamped))
+    return () => cancelAnimationFrame(id)
+  }, [clamped])
+
   return (
     <div
       role="progressbar"
@@ -27,8 +35,12 @@ export function ProgressBar({ value, size = 'md', className, ...props }: Progres
       {...props}
     >
       <div
-        className={cn('h-full rounded-full transition-all duration-300', color)}
-        style={{ width: `${clamped}%` }}
+        className={cn('h-full w-full rounded-full', color)}
+        style={{
+          transform: `scaleX(${displayed / 100})`,
+          transformOrigin: 'left',
+          transition: 'transform 700ms ease-out',
+        }}
         aria-hidden="true"
       />
     </div>

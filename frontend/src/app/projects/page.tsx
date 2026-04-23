@@ -55,7 +55,18 @@ export default function ProjectsPage() {
       {isLoading ? (
         <div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)}</div>
       ) : !data?.data.length ? (
-        <EmptyState icon={FolderOpen} heading="프로젝트가 없습니다" description="첫 번째 프로젝트를 생성해 보세요." />
+        <EmptyState
+          icon={FolderOpen}
+          heading="프로젝트가 없습니다"
+          description={status ? '선택한 상태의 프로젝트가 없습니다. 다른 상태를 선택해 보세요.' : '프로젝트를 생성하면 페이즈·업무·인력 배치를 한 곳에서 관리할 수 있습니다.'}
+          action={
+            !status ? (
+              <Link href="/admin/projects/new">
+                <Button size="sm"><Plus className="h-4 w-4" />첫 프로젝트 만들기</Button>
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
         <StaggerList className="grid gap-4">
           {data.data.map(p => (

@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { EmployeeSummary } from '@/lib/types'
 import { Avatar, Button, Card, CardBody, Input, EmptyState } from '@/components/ui/primitives'
 import { MagnifyingGlass, Plus, Trash, UsersThree } from '@phosphor-icons/react'
+import { AnimatePresence, motion } from 'framer-motion'
 import SkillBadge from '@/components/ui/SkillBadge'
 import type { Proficiency } from '@/lib/types'
 
@@ -68,7 +69,7 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
   const availableEmployees = allEmployees.filter(emp => {
     if (currentMemberIds.has(emp.id)) return false
     if (search) {
-      const q = search.toLowerCase()
+      const q = search.trim().toLowerCase()
       return emp.fullName.toLowerCase().includes(q) ||
         emp.jobTitle.toLowerCase().includes(q) ||
         emp.department.toLowerCase().includes(q)
@@ -83,14 +84,14 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
       projectName,
       projectId,
       roleInProject: addForm.role,
-      allocationPercent: parseInt(addForm.percent) || 0,
+      allocationPercent: Math.min(100, Math.max(0, parseInt(addForm.percent) || 0)),
       startDate: new Date().toISOString().slice(0, 10),
     }, { onSuccess: () => setAddForm(null) })
   }
 
   return (
     <div>
-      <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">멤버 배정</h2>
+      <h2 className="label-section uppercase tracking-wider font-semibold mb-3">멤버 배정</h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <p className="text-xs text-muted-foreground mb-2">현재 멤버 ({currentMembers.length})</p>
@@ -105,7 +106,7 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
                       <Avatar name={findEmployeeName(a.employeeId, allEmployees)} size="sm" />
                       <div>
                         <p className="text-sm font-medium">{findEmployeeName(a.employeeId, allEmployees)}</p>
-                        <p className="text-xs text-muted-foreground">{a.roleInProject} · {a.allocationPercent}%</p>
+                        <p className="text-xs text-muted-foreground">{a.roleInProject} · <span className="numeric">{a.allocationPercent}%</span></p>
                       </div>
                     </div>
                     <Button variant="ghost" size="sm"
@@ -139,6 +140,7 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
                 <Input placeholder="역할 *" value={addForm.role}
                   onChange={e => setAddForm(f => f ? { ...f, role: e.target.value } : f)} />
                 <Input type="number" placeholder="할당률 %" value={addForm.percent}
+                  min={0} max={100}
                   onChange={e => setAddForm(f => f ? { ...f, percent: e.target.value } : f)} />
                 <div className="flex gap-2">
                   <Button size="sm" disabled={!addForm.role} loading={isCreating} onClick={handleAdd}>확인</Button>
@@ -161,7 +163,7 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
                         <Avatar name={emp.fullName} size="sm" />
                         <div>
                           <p className="text-sm font-medium">{emp.fullName}</p>
-                          <p className="text-[10px] text-muted-foreground">{emp.jobTitle} · {emp.team ?? emp.department}</p>
+                          <p className="text-xs text-muted-foreground">{emp.jobTitle} · {emp.team ?? emp.department}</p>
                         </div>
                       </div>
                       <Button size="sm" disabled={isFull}
@@ -175,33 +177,45 @@ export default function MemberAssignmentSection({ projectId, projectName }: Prop
                       </Button>
                     </div>
                     <div>
-                      <div className="flex justify-between text-[10px] text-muted-foreground mb-0.5">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-0.5">
                         <span>할당률</span>
-                        <span className={allocationColor(emp.totalAllocationPercent)}>{emp.totalAllocationPercent}%</span>
+                        <span className={`numeric ${allocationColor(emp.totalAllocationPercent)}`}>{emp.totalAllocationPercent}%</span>
                       </div>
                       <div className="h-1 bg-muted rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${allocationBarColor(emp.totalAllocationPercent)}`}
-                          style={{ width: `${Math.min(emp.totalAllocationPercent, 100)}%` }} />
+                        <div className={`h-full w-full rounded-full ${allocationBarColor(emp.totalAllocationPercent)}`}
+                          style={{
+                            transform: `scaleX(${Math.min(emp.totalAllocationPercent, 100) / 100})`,
+                            transformOrigin: 'left',
+                            transition: 'transform 700ms ease-out',
+                          }} />
                       </div>
                     </div>
-                    {isExpanded && expandedEmployee && (
-                      <div className="space-y-1.5 pt-1 border-t border-border">
-                        {expandedEmployee.skills.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {expandedEmployee.skills.map(s => (
-                              <SkillBadge key={s.id} name={s.skillId} proficiency={s.proficiency as Proficiency} />
-                            ))}
-                          </div>
-                        )}
-                        {expandedEmployee.assignments.filter(a => a.isActive).length > 0 && (
-                          <div className="text-[10px] text-muted-foreground">
-                            {expandedEmployee.assignments.filter(a => a.isActive).map(a => (
-                              <span key={a.id} className="mr-2">{a.projectName} ({a.allocationPercent}%)</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    <AnimatePresence>
+                      {isExpanded && expandedEmployee && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+                          className="space-y-1.5 pt-1 border-t border-border overflow-hidden"
+                        >
+                          {expandedEmployee.skills.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {expandedEmployee.skills.map(s => (
+                                <SkillBadge key={s.id} name={s.skillId} proficiency={s.proficiency as Proficiency} />
+                              ))}
+                            </div>
+                          )}
+                          {expandedEmployee.assignments.filter(a => a.isActive).length > 0 && (
+                            <div className="text-xs text-muted-foreground">
+                              {expandedEmployee.assignments.filter(a => a.isActive).map(a => (
+                                <span key={a.id} className="mr-2">{a.projectName} (<span className="numeric">{a.allocationPercent}%</span>)</span>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </CardBody>
                 </Card>
               )

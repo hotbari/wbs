@@ -41,7 +41,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div>
-            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">페이즈</h2>
+            <h2 className="label-caps mb-3">페이즈</h2>
             {project.phases.map(phase => (
               <Card key={phase.id} className="mb-2">
                 <CardBody className="flex items-center justify-between py-3">

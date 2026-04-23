@@ -57,7 +57,7 @@ export default function PmStaffingPage() {
 
           <Card className="max-w-2xl">
             <CardBody className="space-y-4">
-              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">조건 설정</h2>
+              <h2 className="label-caps">조건 설정</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">최소 가용률 (%)</label>

@@ -37,7 +37,7 @@ export default function ProjectMemberPanel({ phases }: Props) {
   return (
     <div className="hidden md:block w-52 shrink-0">
       <div className="sticky top-20 border border-border rounded-[var(--radius-xl)] p-4">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h3 className="label-caps mb-3">
           멤버 ({members.length})
         </h3>
         {members.length === 0 ? (
@@ -49,7 +49,7 @@ export default function ProjectMemberPanel({ phases }: Props) {
                 <Avatar name={m.name} size="sm" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate group-hover:text-accent transition-colors">{m.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{m.taskCount}개 업무</p>
+                  <p className="text-xs text-muted-foreground"><span className="numeric">{m.taskCount}</span>개 업무</p>
                 </div>
               </Link>
             ))}

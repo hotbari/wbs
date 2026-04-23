@@ -39,7 +39,7 @@ export default function TaskDetailDrawer({ task, onClose }: Props) {
             {task.dueDate && <p className="text-sm text-muted-foreground">마감일: {task.dueDate}</p>}
 
             <div className="border-t border-border pt-4">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">댓글</h3>
+              <h3 className="label-caps mb-3">댓글</h3>
               <div className="space-y-2">
                 {comments?.map(c => (
                   <Card key={c.id}>

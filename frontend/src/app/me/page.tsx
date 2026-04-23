@@ -43,7 +43,7 @@ export default function MePage() {
           <div className="flex-1 space-y-4">
             <Card>
               <CardBody className="space-y-3">
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <h2 className="label-caps">
                   내 업무 ({tasks?.length ?? 0})
                 </h2>
                 <EmployeeTaskList tasks={tasks ?? []} />
@@ -52,7 +52,7 @@ export default function MePage() {
 
             <Card>
               <CardBody className="space-y-3">
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">계정 설정</h2>
+                <h2 className="label-caps">계정 설정</h2>
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs text-muted-foreground">이메일</label>
@@ -84,7 +84,7 @@ export default function MePage() {
           <div className="w-full md:w-56 shrink-0 space-y-4">
             <Card>
               <CardBody className="space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">할당률</h3>
+                <h3 className="label-caps">할당률</h3>
                 <p className="text-3xl font-bold font-mono tabular-nums tracking-tighter">{employee.totalAllocationPercent}%</p>
                 <ProgressBar value={employee.totalAllocationPercent} />
                 {employee.assignments.length > 0 && (
@@ -92,7 +92,7 @@ export default function MePage() {
                     {employee.assignments.filter(a => a.isActive).map(a => (
                       <div key={a.id} className="flex justify-between text-xs">
                         <span className="text-muted-foreground truncate">{a.projectName}</span>
-                        <span>{a.allocationPercent}%</span>
+                        <span className="numeric">{a.allocationPercent}%</span>
                       </div>
                     ))}
                   </div>
@@ -102,7 +102,7 @@ export default function MePage() {
 
             <Card>
               <CardBody className="space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">상세 정보</h3>
+                <h3 className="label-caps">상세 정보</h3>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between"><span className="text-muted-foreground">부서</span><span>{employee.department}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">팀</span><span>{employee.team ?? '—'}</span></div>

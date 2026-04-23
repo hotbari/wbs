@@ -68,7 +68,7 @@ export default function SkillEditPanel({ employeeId }: Props) {
     <Card>
       <CardBody className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">스킬</h3>
+          <h3 className="label-caps">스킬</h3>
           {editState?.type !== 'add' && (
             <Button variant="ghost" size="sm" onClick={openAdd}>
               <Plus className="h-3.5 w-3.5" />추가

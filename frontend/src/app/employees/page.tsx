@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useDeferredValue } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -9,6 +9,7 @@ import SkillFilterPanel from '@/components/ui/SkillFilterPanel'
 import { Button, Input, Select, Skeleton, SkeletonCircle, EmptyState, PageTransition, StaggerList, StaggerItem } from '@/components/ui/primitives'
 import { Plus, MagnifyingGlass, Users, Funnel } from '@phosphor-icons/react'
 import { Card, CardBody } from '@/components/ui/primitives'
+import WelcomeBanner from '@/components/ui/WelcomeBanner'
 
 function EmployeeCardSkeleton() {
   return (
@@ -30,10 +31,12 @@ export default function EmployeesPage() {
   const [maxAllocationPercent, setMaxAllocationPercent] = useState<number | undefined>(undefined)
   const [page, setPage] = useState(1)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const { isAdmin } = useAuth()
+  const deferredSearch = useDeferredValue(search)
+  const deferredDepartment = useDeferredValue(department)
+  const { user, isAdmin } = useAuth()
   const { data, isLoading, error } = useEmployeeList({
-    search: search || undefined,
-    department: department || undefined,
+    search: deferredSearch || undefined,
+    department: deferredDepartment || undefined,
     skillIds: selectedSkillIds.length > 0 ? selectedSkillIds : undefined,
     maxAllocationPercent,
     page,
@@ -89,6 +92,7 @@ export default function EmployeesPage() {
 
   return (
     <PageTransition>
+      {user && <WelcomeBanner userId={user.id} role={user.role} />}
       <div className="flex gap-6">
         {/* Sticky sidebar — desktop only */}
         <aside className="hidden lg:block w-[220px] shrink-0">
@@ -163,7 +167,28 @@ export default function EmployeesPage() {
               {Array.from({ length: 6 }).map((_, i) => <EmployeeCardSkeleton key={i} />)}
             </div>
           ) : data?.data.length === 0 ? (
-            <EmptyState icon={Users} heading="직원을 찾을 수 없습니다" description="검색어나 필터를 조정해 보세요." />
+            <EmptyState
+              icon={Users}
+              heading="직원을 찾을 수 없습니다"
+              description="검색어나 필터 조건을 바꿔보거나, 전체 목록으로 돌아가세요."
+              action={
+                (search || department || selectedSkillIds.length > 0 || maxAllocationPercent) ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setSearch('')
+                      setDepartment('')
+                      setSelectedSkillIds([])
+                      setMaxAllocationPercent(undefined)
+                      resetPage()
+                    }}
+                  >
+                    필터 초기화
+                  </Button>
+                ) : undefined
+              }
+            />
           ) : (
             <StaggerList className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {data?.data.map(emp => (

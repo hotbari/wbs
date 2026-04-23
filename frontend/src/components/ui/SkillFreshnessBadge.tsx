@@ -10,7 +10,7 @@ export default function SkillFreshnessBadge({ updatedAt }: Props) {
   const months = Math.floor(days / 30)
   const variant = days > 90 ? 'destructive' : 'warning'
   return (
-    <Badge variant={variant} className="text-[10px] py-0">
+    <Badge variant={variant} className="text-xs py-0">
       {months}개월 전 업데이트
     </Badge>
   )

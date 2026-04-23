@@ -2,7 +2,7 @@
 import type { MyTask } from '@/lib/types'
 import { Badge, ProgressBar, EmptyState } from '@/components/ui/primitives'
 import { Warning, ListDashes } from '@phosphor-icons/react'
-import { statusToProgress, statusToLabel } from '@/lib/utils'
+import { statusToProgress, statusToLabel, isOverdue } from '@/lib/utils'
 
 const STATUS_VARIANT: Record<string, 'default' | 'info' | 'success'> = {
   TODO: 'default', IN_PROGRESS: 'info', DONE: 'success',
@@ -42,11 +42,11 @@ export default function EmployeeTaskList({ tasks }: Props) {
             <p className={`text-xs font-semibold mb-2 ${getProjectColor(idx)}`}>{projectName}</p>
             <div className="space-y-1">
               {group.tasks.map(task => {
-                const isOverdue = task.dueDate && task.status !== 'DONE' && new Date(task.dueDate) < new Date()
+                const overdue = isOverdue(task.dueDate, task.status)
                 const isDone = task.status === 'DONE'
                 return (
                   <div key={task.id} className="flex items-center gap-2 py-1.5 px-2 rounded-[var(--radius-md)] bg-muted/50">
-                    <Badge variant={STATUS_VARIANT[task.status]} className="text-[10px]">
+                    <Badge variant={STATUS_VARIANT[task.status]} className="text-xs">
                       {statusToLabel(task.status)}
                     </Badge>
                     <span className={`flex-1 text-sm truncate ${isDone ? 'line-through text-muted-foreground' : ''}`}>
@@ -56,12 +56,12 @@ export default function EmployeeTaskList({ tasks }: Props) {
                       <ProgressBar value={statusToProgress(task.status)} size="sm" />
                     </div>
                     {task.dueDate && (
-                      isOverdue ? (
-                        <span className="flex items-center gap-0.5 text-[10px] text-destructive font-medium">
-                          <Warning className="h-3 w-3" weight="bold" />{task.dueDate}
+                      overdue ? (
+                        <span className="flex items-center gap-0.5 text-xs text-destructive font-medium">
+                          <Warning className="h-3 w-3" weight="bold" /><span className="numeric">{task.dueDate}</span>
                         </span>
                       ) : (
-                        <span className="text-[10px] text-muted-foreground">{isDone ? task.dueDate : `~${task.dueDate}`}</span>
+                        <span className="text-xs text-muted-foreground numeric">{isDone ? task.dueDate : `~${task.dueDate}`}</span>
                       )
                     )}
                   </div>

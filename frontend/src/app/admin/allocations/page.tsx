@@ -63,12 +63,12 @@ export default function AllocationsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">직원</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">프로젝트</th>
-                      <th className="hidden md:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">역할</th>
-                      <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">%</th>
-                      <th className="hidden lg:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">시작일</th>
-                      <th className="hidden lg:table-cell text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground py-3 px-4">종료일</th>
+                      <th className="text-left label-caps py-3 px-4">직원</th>
+                      <th className="text-left label-caps py-3 px-4">프로젝트</th>
+                      <th className="hidden md:table-cell text-left label-caps py-3 px-4">역할</th>
+                      <th className="text-left label-caps py-3 px-4">%</th>
+                      <th className="hidden lg:table-cell text-left label-caps py-3 px-4">시작일</th>
+                      <th className="hidden lg:table-cell text-left label-caps py-3 px-4">종료일</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>

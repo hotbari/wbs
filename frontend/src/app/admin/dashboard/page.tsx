@@ -9,23 +9,23 @@ import { Users, ChartBar, UserCircle } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import type { EmployeeSummary } from '@/lib/types'
 
-// Count-up hook
+// Count-up hook — rAF-driven, frame-sync, cancels on unmount/target change
 function useCountUp(target: number, duration = 800) {
   const [count, setCount] = useState(0)
-  const startedRef = useRef(false)
+  const rafRef = useRef<number | null>(null)
   useEffect(() => {
-    if (startedRef.current) return
-    startedRef.current = true
-    if (target === 0) return
-    const interval = 40
-    const steps = Math.ceil(duration / interval)
-    let step = 0
-    const timer = setInterval(() => {
-      step++
-      setCount(Math.round((target * step) / steps))
-      if (step >= steps) clearInterval(timer)
-    }, interval)
-    return () => clearInterval(timer)
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    if (target === 0) { setCount(0); return }
+    let startTime: number | null = null
+    function step(ts: number) {
+      if (!startTime) startTime = ts
+      const progress = Math.min((ts - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(target * eased))
+      if (progress < 1) rafRef.current = requestAnimationFrame(step)
+    }
+    rafRef.current = requestAnimationFrame(step)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [target, duration])
   return count
 }
@@ -123,7 +123,7 @@ function OverAllocatedBentoCard({ items }: { items: { employee: EmployeeSummary;
       <CardBody>
         <div className="flex items-center justify-between mb-4">
           <p className="label-section">고할당 직원</p>
-          <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-warning inline-block" />80%+
             </span>
@@ -150,11 +150,12 @@ function OverAllocatedBentoCard({ items }: { items: { employee: EmployeeSummary;
                 <div className="h-1.5 bg-surface-subtle rounded-full overflow-hidden">
                   <motion.div
                     className={cn(
-                      'h-full rounded-full',
+                      'h-full w-full rounded-full',
                       isOver ? 'bg-destructive' : isWarn ? 'bg-warning' : 'bg-accent',
                     )}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(allocationPercent, 100)}%` }}
+                    style={{ transformOrigin: 'left' }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: Math.min(allocationPercent, 100) / 100 }}
                     transition={{ delay: i * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   />
                 </div>
