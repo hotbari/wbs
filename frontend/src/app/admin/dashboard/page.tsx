@@ -55,9 +55,7 @@ function MetricBentoCard({
       whileHover={{ y: -4 }}
       className="bezel will-change-transform"
     >
-      <div className="bezel-inner relative overflow-hidden p-5">
-        {/* Corner glow */}
-        <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-accent/10 blur-2xl pointer-events-none" />
+      <div className="bezel-inner p-5">
         <div className="flex items-center gap-2 mb-3">
           <Icon className="h-4 w-4 text-accent" weight="duotone" />
           <p className="label-section">{label}</p>

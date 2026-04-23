@@ -79,10 +79,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Hero header */}
         <div className="relative mb-2 pb-10">
-          {/* Ambient glows */}
-          <div className="absolute -top-8 -left-8 w-48 h-48 rounded-full bg-accent/6 blur-3xl pointer-events-none" />
-          <div className="absolute -top-4 right-1/3 w-32 h-32 rounded-full bg-accent/4 blur-2xl pointer-events-none" />
-
           <div className="flex items-end justify-between">
             <div className="flex items-end gap-5">
               <motion.div
