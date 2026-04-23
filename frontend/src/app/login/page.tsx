@@ -34,7 +34,7 @@ export default function LoginPage() {
       <div className="flex flex-col justify-between min-h-[100dvh] p-8 lg:p-12">
         {/* Logo top-left */}
         <div className="flex items-center gap-2">
-          <UsersThree className="h-5 w-5 text-accent" weight="duotone" />
+          <UsersThree className="h-5 w-5 text-brand-mark" weight="duotone" />
           <span className="font-semibold text-foreground">Workforce</span>
         </div>
 

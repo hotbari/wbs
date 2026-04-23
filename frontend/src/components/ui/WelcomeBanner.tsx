@@ -90,28 +90,11 @@ export default function WelcomeBanner({ userId, role }: WelcomeBannerProps) {
           transition={{ type: 'spring', stiffness: 480, damping: 32 }}
           className="mb-6"
         >
-          {/* Outer bezel shell */}
-          <div className="relative rounded-2xl p-[3px] bg-[color-mix(in_srgb,var(--accent)_8%,var(--foreground)_3%)] shadow-sm overflow-hidden">
-            {/* Subtle accent gradient top edge */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-0 top-0 h-px"
-              style={{ background: 'linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 40%, transparent) 40%, color-mix(in srgb, var(--accent) 20%, transparent) 100%)' }}
-            />
-            {/* Inner core */}
-            <div className="relative rounded-[calc(1rem-3px)] bg-card px-5 py-4 flex items-start gap-4"
-              style={{ boxShadow: 'inset 0 1px 1px rgb(255 255 255 / 0.8)' }}
-            >
+          <div className="bezel">
+            <div className="bezel-inner px-5 py-4 flex items-start gap-4 relative overflow-hidden">
               {/* Icon column */}
-              <div
-                className="shrink-0 mt-0.5 w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: 'color-mix(in srgb, var(--accent) 12%, transparent)' }}
-              >
-                <Icon
-                  className="h-5 w-5"
-                  style={{ color: 'var(--accent)' }}
-                  weight="duotone"
-                />
+              <div className="shrink-0 mt-0.5 w-9 h-9 rounded-xl flex items-center justify-center bg-muted">
+                <Icon className="h-5 w-5 text-brand-mark" weight="duotone" />
               </div>
 
               {/* Content */}
@@ -120,20 +103,16 @@ export default function WelcomeBanner({ userId, role }: WelcomeBannerProps) {
                   <span className="eyebrow">{config.eyebrow}</span>
                 </div>
                 <h2 className="heading-2 mb-1">{config.heading}</h2>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">{config.body}</p>
+                <p className="body-base text-muted-foreground mb-3">{config.body}</p>
 
-                {/* Quick actions */}
+                {/* Quick actions — chips keep accent text (they ARE calls to action) but neutral borders */}
                 <div className="flex flex-wrap gap-2">
                   {config.actions.map((action) => (
                     <Link
                       key={action.href}
                       href={action.href}
                       onClick={dismiss}
-                      className="welcome-action-link inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-150 hover:shadow-sm"
-                      style={{
-                        borderColor: 'color-mix(in srgb, var(--accent) 25%, var(--border))',
-                        color: 'var(--accent-text)',
-                      }}
+                      className="welcome-action-link inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border text-accent-text transition-colors duration-150 hover:border-accent/40"
                     >
                       {action.label}
                       <ArrowRight className="h-3 w-3" weight="bold" />

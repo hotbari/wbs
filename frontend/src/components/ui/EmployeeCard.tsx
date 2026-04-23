@@ -47,7 +47,7 @@ export default function EmployeeCard({ employee }: { employee: EmployeeSummary }
               {employee.topSkills.slice(0, 3).map(s => (
                 <span
                   key={s.skillId}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] bg-accent-light/40 text-xs font-medium text-accent-text"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] bg-muted text-xs font-medium text-foreground"
                 >
                   {s.name}
                   <span className="flex gap-0.5 ml-0.5">

@@ -20,7 +20,7 @@ export default function LoginVisualPanel() {
           className="font-bold leading-none tracking-tighter"
           style={{
             fontSize: 'clamp(3rem, 8vw, 6rem)',
-            color: 'color-mix(in srgb, var(--accent) 12%, var(--foreground) 6%)',
+            color: 'color-mix(in srgb, var(--foreground) 10%, transparent)',
           }}
         >
           인력<br />배치

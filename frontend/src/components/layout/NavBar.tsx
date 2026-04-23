@@ -125,7 +125,7 @@ export default function NavBar() {
             className="flex items-center gap-2 font-semibold text-foreground shrink-0"
             onClick={closeMenu}
           >
-            <UsersThree className="h-5 w-5 text-accent" weight="duotone" />
+            <UsersThree className="h-5 w-5 text-brand-mark" weight="duotone" />
             <span className="hidden sm:inline">Workforce</span>
           </Link>
 
