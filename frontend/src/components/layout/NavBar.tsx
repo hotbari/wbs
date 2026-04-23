@@ -163,6 +163,7 @@ export default function NavBar() {
                 <Avatar
                   name={user!.email}
                   size="sm"
+                  tone="accent"
                   className="cursor-pointer hover:ring-2 hover:ring-accent transition-all"
                 />
               </motion.div>

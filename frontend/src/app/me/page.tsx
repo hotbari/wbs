@@ -31,7 +31,7 @@ export default function MePage() {
     <PageTransition>
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Avatar name={employee.fullName} size="lg" />
+          <Avatar name={employee.fullName} size="lg" tone="accent" />
           <div>
             <h1 className="heading-1">{employee.fullName}</h1>
             <p className="body-base text-muted-foreground">{employee.jobTitle} · {employee.team ?? employee.department}</p>
