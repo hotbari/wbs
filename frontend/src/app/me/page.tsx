@@ -33,8 +33,8 @@ export default function MePage() {
         <div className="flex items-center gap-4">
           <Avatar name={employee.fullName} size="lg" />
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{employee.fullName}</h1>
-            <p className="text-muted-foreground">{employee.jobTitle} · {employee.team ?? employee.department}</p>
+            <h1 className="heading-1">{employee.fullName}</h1>
+            <p className="body-base text-muted-foreground">{employee.jobTitle} · {employee.team ?? employee.department}</p>
             <p className="text-sm text-muted-foreground">{employee.email}</p>
           </div>
         </div>
