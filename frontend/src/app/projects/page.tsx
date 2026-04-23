@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useProjectList } from '@/lib/hooks/useProjects'
 import type { ProjectStatus } from '@/lib/types'
-import { Button, Badge, Card, CardBody, Skeleton, EmptyState, PageTransition, StaggerList, StaggerItem, PageHeader } from '@/components/ui/primitives'
+import { Button, Badge, MotionCard, Card, CardBody, Skeleton, EmptyState, PageTransition, StaggerList, StaggerItem, PageHeader } from '@/components/ui/primitives'
 import { Plus, FolderOpen } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
@@ -78,7 +78,7 @@ export default function ProjectsPage() {
           {data.data.map(p => (
             <StaggerItem key={p.id}>
               <Link href={`/projects/${p.id}`}>
-                <Card className="transition-shadow hover:shadow-md">
+                <MotionCard variant="flat">
                   <CardBody className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{p.name}</p>
@@ -87,7 +87,7 @@ export default function ProjectsPage() {
                     </div>
                     <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status] ?? p.status}</Badge>
                   </CardBody>
-                </Card>
+                </MotionCard>
               </Link>
             </StaggerItem>
           ))}

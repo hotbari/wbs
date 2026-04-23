@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import AdminGuard from '@/components/guards/AdminGuard'
 import EmployeeCard from '@/components/ui/EmployeeCard'
 import { useDashboard } from '@/lib/hooks/useDashboard'
-import { Avatar, Card, CardBody, ProgressBar, Skeleton, EmptyState, PageTransition } from '@/components/ui/primitives'
+import { Avatar, Card, CardBody, MotionCard, ProgressBar, Skeleton, EmptyState, PageTransition } from '@/components/ui/primitives'
 import { Users, ChartBar, UserCircle } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import type { EmployeeSummary } from '@/lib/types'
@@ -75,7 +75,7 @@ function MetricBentoCard({
 
 function AvailabilityBentoCard({ employees }: { employees: EmployeeSummary[] }) {
   return (
-    <Card>
+    <MotionCard>
       <CardBody>
         <div className="flex items-center gap-2 mb-4">
           {/* Live pulse dot */}
@@ -111,13 +111,13 @@ function AvailabilityBentoCard({ employees }: { employees: EmployeeSummary[] }) 
           </div>
         )}
       </CardBody>
-    </Card>
+    </MotionCard>
   )
 }
 
 function OverAllocatedBentoCard({ items }: { items: { employee: EmployeeSummary; allocationPercent: number }[] }) {
   return (
-    <Card>
+    <MotionCard>
       <CardBody>
         <div className="flex items-center justify-between mb-4">
           <p className="label-section">고할당 직원</p>
@@ -162,7 +162,7 @@ function OverAllocatedBentoCard({ items }: { items: { employee: EmployeeSummary;
           })}
         </div>
       </CardBody>
-    </Card>
+    </MotionCard>
   )
 }
 
