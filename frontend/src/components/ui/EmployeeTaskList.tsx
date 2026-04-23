@@ -9,8 +9,8 @@ const STATUS_VARIANT: Record<string, 'default' | 'info' | 'success'> = {
 }
 
 const PROJECT_COLORS = [
-  'text-indigo-400', 'text-pink-400', 'text-emerald-400',
-  'text-amber-400', 'text-cyan-400', 'text-violet-400',
+  'text-label-1', 'text-label-2', 'text-label-3',
+  'text-label-4', 'text-label-5', 'text-label-6',
 ]
 
 function getProjectColor(index: number) {
