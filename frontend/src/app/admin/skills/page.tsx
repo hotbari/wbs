@@ -5,7 +5,7 @@ import { useSkillList, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { mergeSkills } from '@/lib/api/skills'
 import type { Skill } from '@/lib/types'
-import { Card, CardBody, Input, Button, EmptyState, PageTransition, PageHeader } from '@/components/ui/primitives'
+import { Card, CardBody, Input, Button, EmptyState, PageTransition, PageHeader, ConfirmDialog } from '@/components/ui/primitives'
 import { PencilSimple, Trash, Tag, Plus, WarningCircle, ArrowsLeftRight } from '@phosphor-icons/react'
 
 export default function AdminSkillsPage() {
@@ -28,6 +28,7 @@ export default function AdminSkillsPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', category: '' })
   const [mergeSourceId, setMergeSourceId] = useState<string | null>(null)
+  const [pendingMergeTarget, setPendingMergeTarget] = useState<Skill | null>(null)
 
   const deleteMsg = (deleteError as { response?: { data?: { message?: string } } } | null)?.response?.data?.message
   const mergeSource = skills?.find((s: Skill) => s.id === mergeSourceId)
@@ -97,9 +98,7 @@ export default function AdminSkillsPage() {
                       onClick={() => {
                         if (merging) return
                         if (mergeSourceId && skill.id !== mergeSourceId) {
-                          if (confirm(`"${mergeSource?.name}"을(를) "${skill.name}"으로 병합하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-                            merge({ sourceId: mergeSourceId, targetId: skill.id })
-                          }
+                          setPendingMergeTarget(skill)
                         }
                       }}
                     >
@@ -171,6 +170,31 @@ export default function AdminSkillsPage() {
             </CardBody>
           </Card>
         </div>
+        <ConfirmDialog
+          open={!!pendingMergeTarget}
+          title="스킬 병합 확인"
+          description={
+            pendingMergeTarget && mergeSource
+              ? <>
+                  <strong>{mergeSource.name}</strong>을(를) <strong>{pendingMergeTarget.name}</strong>으로 병합하시겠습니까?
+                  <br />
+                  이 작업은 되돌릴 수 없습니다.
+                </>
+              : null
+          }
+          confirmLabel="병합"
+          variant="destructive"
+          loading={merging}
+          onConfirm={() => {
+            if (mergeSourceId && pendingMergeTarget) {
+              merge(
+                { sourceId: mergeSourceId, targetId: pendingMergeTarget.id },
+                { onSuccess: () => setPendingMergeTarget(null) },
+              )
+            }
+          }}
+          onClose={() => setPendingMergeTarget(null)}
+        />
       </PageTransition>
     </AdminGuard>
   )
