@@ -1,6 +1,7 @@
 import { test as setup, expect } from "@playwright/test";
 
 const adminAuthFile = "e2e/.auth/admin.json";
+const employeeAuthFile = "e2e/.auth/employee.json";
 
 setup("authenticate as admin", async ({ page }) => {
   await page.goto("/login");
@@ -13,4 +14,14 @@ setup("authenticate as admin", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Employees" })).toBeVisible({ timeout: 10000 });
 
   await page.context().storageState({ path: adminAuthFile });
+});
+
+setup("authenticate as employee", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByPlaceholder("Email").fill("employee@test.com");
+  await page.getByPlaceholder("Password").fill("password");
+  await page.getByRole("button", { name: /sign in/i }).click();
+
+  await page.waitForURL("**/employees", { timeout: 15000 });
+  await page.context().storageState({ path: employeeAuthFile });
 });
