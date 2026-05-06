@@ -21,6 +21,10 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFound(e: NotFoundException) = mapOf("message" to e.message)
 
+    @ExceptionHandler(BadRequestException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleBadRequest(e: BadRequestException) = mapOf("message" to e.message)
+
     @ExceptionHandler(ConflictException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleConflict(e: ConflictException) = mapOf("message" to e.message)
