@@ -74,14 +74,14 @@
 - 아이콘: Phosphor Icons duotone
 
 ### 디자인 토큰 (CSS custom properties)
-신규 토큰을 글로벌 스타일에 추가:
-- `--event-private-bg`, `--event-private-border` — amber 톤
-- `--event-public-mine-bg`, `--event-public-mine-border` — zinc 진한 톤
-- `--event-public-other-bg`, `--event-public-other-border` — zinc 옅은 톤
+모든 이벤트 색상은 CSS custom property로만 표현 (CLAUDE.md "no hardcoded hex" 준수). 글로벌 스타일에 추가:
+- `--event-private-bg`, `--event-private-border` — amber 패밀리에 매핑
+- `--event-public-mine-bg`, `--event-public-mine-border` — zinc 진한 톤에 매핑
+- `--event-public-other-bg`, `--event-public-other-border` — zinc 옅은 톤에 매핑
 - `--calendar-today-tint` — emerald 옅은 그라데이션
 - `--calendar-grid-line` — `--border` 토큰 재사용
 
-이벤트 색은 emerald와 분리 (emerald는 기존대로 할당 헬스용).
+이벤트 색은 emerald와 분리 (emerald는 기존대로 할당 헬스 시맨틱). 토큰의 구체적 16진 값은 디자인 토큰 정의 단계에서 확정 — 본 spec의 amber/zinc 표기는 디자인 패밀리 가이드일 뿐 구현 시 직접 사용 금지.
 
 ## 5. Data Model
 
@@ -134,7 +134,9 @@ interface CalendarEventRepository : JpaRepository<CalendarEvent, UUID> {
 }
 ```
 
-### Flyway Migration `V19__create_calendar_events.sql`
+### Flyway Migration `V14__create_calendar_events.sql`
+
+> 메인 브랜치 기준 최신은 V13. 다른 작업과 동시 머지 시 V14가 충돌하면 다음 비어있는 번호 사용.
 ```sql
 CREATE TABLE calendar_events (
   id UUID PRIMARY KEY,
@@ -157,12 +159,14 @@ CREATE INDEX idx_calendar_events_public ON calendar_events (is_public) WHERE is_
 ```
 
 ### Validation Rules
-- `title`: not blank, ≤ 200자
-- `description`: ≤ 2000자
-- `location`: ≤ 200자
-- `endAt >= startAt` (DB CHECK + 서비스 검증)
+필드 검증은 JSR-380 어노테이션으로 표현해, 기존 `GlobalExceptionHandler.handleValidation(MethodArgumentNotValidException)`을 재사용 → 400 응답.
+- `title`: `@NotBlank`, `@Size(max = 200)`
+- `description`: `@Size(max = 2000)`
+- `location`: `@Size(max = 200)`
+- 크로스-필드 (`endAt >= startAt`): 요청 DTO에 `@AssertTrue` 메서드 검증자 추가, 예: `fun isRangeValid(): Boolean = !endAt.isBefore(startAt)`. 동일 핸들러로 400.
 - `allDay = true`이면 서비스 레이어에서 `startAt`/`endAt`을 KST 자정 경계로 정규화
 - 다일 종일: `endAt`은 종료일 **다음 날 00:00:00 KST** (반-개방 구간 `[start, end)`)
+- 추가 비즈니스 규칙(예: 범위 92일 초과)은 서비스에서 새 `BadRequestException`(추가 필요) 또는 기존 `ConflictException` 중 적절한 것 선택. 신규 예외 추가 시 `Exceptions.kt` + `GlobalExceptionHandler` 양쪽 갱신 (구현 단계 결정).
 
 ## 6. API
 
@@ -221,10 +225,10 @@ data class CalendarEventResponse(
     val endAt: Instant,
     val allDay: Boolean,
     val isPublic: Boolean,
-    val isMine: Boolean,
-    val canEdit: Boolean              // 클라 편의용, isMine과 동일
+    val isMine: Boolean              // viewer == owner. 권한 판단의 단일 소스
 )
 ```
+클라이언트에서 수정/삭제 버튼 가시성은 `isMine`만 참조. 서버는 mutating 호출에서 owner를 항상 재검증.
 
 ## 7. Permissions & Validation Matrix
 
@@ -235,7 +239,7 @@ data class CalendarEventResponse(
 | `PUT /events/{id}` | ✅ 200 | ❌ 403 | ❌ 404 |
 | `DELETE /events/{id}` | ✅ 204 | ❌ 403 | ❌ 404 |
 
-서버는 `isMine`/`canEdit` 클라이언트 플래그를 신뢰하지 않고 모든 mutating 호출에서 owner를 재검증.
+서버는 `isMine` 클라이언트 플래그를 신뢰하지 않고 모든 mutating 호출에서 owner를 재검증.
 
 ## 8. Frontend Structure
 
@@ -249,7 +253,7 @@ frontend/src/
     CalendarMonthView.tsx          # 7×6 그리드, 다일 이벤트 row-span
     CalendarWeekView.tsx           # 7열 × 시간행 타임라인
     EventBlock.tsx                 # 공통 이벤트 시각 (variant: chip|timeline)
-    EventDetailModal.tsx           # 클릭 시 상세 (Modal 프리미티브 재사용)
+    EventDetailModal.tsx           # 클릭 시 상세 (아래 Modal 의존성 참조)
     EventFormModal.tsx             # 생성/수정 폼
     useCalendarEvents.ts           # TanStack Query 훅
     calendar-utils.ts              # 그리드 계산, 다일 이벤트 슬롯 배치, 종일 정규화
@@ -298,11 +302,13 @@ frontend/src/
 ## 10. Visual Treatment
 
 ### Event Variant Tokens
-| 변형 | bg | left-border | icon |
+색상은 모두 CSS custom property로만 사용. 괄호 안의 패밀리는 디자인 의도일 뿐 직접 16진 사용 금지.
+
+| 변형 | bg token | border token | icon |
 |---|---|---|---|
-| 내 비공개 | `--event-private-bg` (amber-50) | `--event-private-border` (amber-500) | Phosphor `Lock` (12px) |
-| 내 공개 | `--event-public-mine-bg` (zinc-50) | `--event-public-mine-border` (zinc-700) | Phosphor `Globe` (12px) |
-| 타인 공개 | `--event-public-other-bg` (zinc-50, 85% opacity) | `--event-public-other-border` (zinc-400) | 작성자 이니셜 칩 |
+| 내 비공개 | `--event-private-bg` (amber 옅은 톤) | `--event-private-border` (amber 진한 톤) | Phosphor `Lock` (12px) |
+| 내 공개 | `--event-public-mine-bg` (zinc 옅은 톤) | `--event-public-mine-border` (zinc 진한 톤) | Phosphor `Globe` (12px) |
+| 타인 공개 | `--event-public-other-bg` (zinc 옅은 톤) | `--event-public-other-border` (zinc 중간 톤) | 작성자 이니셜 칩 |
 
 ### Typography
 - 이벤트 제목: Plus Jakarta Sans, 11–13px
@@ -317,7 +323,7 @@ frontend/src/
 ### Motion
 - 월 ◀▶ 전환: 300ms spring(stiffness 450, damping 30) — `transform`/`opacity`만
 - 이벤트 hover: `translateY(-1px)` + `scale(1.01)`, 150ms
-- 모달 enter/exit: 기존 Modal 스프링
+- 모달 enter/exit: Modal 프리미티브 표준 스프링 (위 의존성 섹션의 A/B 결정에 따름)
 - 새 이벤트 생성 직후 fade-in (스태거 없음)
 
 ### Multi-day 이벤트
@@ -325,12 +331,21 @@ frontend/src/
 - row 경계 넘을 때: 새 row 첫 셀에서 다시 시작 (보더 좌측만 다시)
 - 첫 셀에 제목, 이후 셀은 `→` 또는 빈 칸으로 연속감만 표현
 
+### Modal Primitive 의존성
+브랜치 분기 시점(main 기준)에 `frontend/src/components/ui/primitives/Modal.tsx`는 존재하지 않음. 별도 작업(wave2)에서 추가 중일 수 있으나 머지 시점이 불확실. 구현 계획은 다음 둘 중 하나로:
+
+1. **선택지 A (선호):** 캘린더 작업 첫 단계로 신규 `Modal.tsx` 프리미티브를 추가 (이중 베젤 카드 + spring fade-scale, ESC/오버레이 클릭 닫기, focus trap). 다른 기능에서도 재사용 가능한 자산이 됨.
+2. **선택지 B:** 머지 순서 조정으로 wave2의 Modal/ConfirmDialog가 main에 먼저 들어오게 한 뒤 `import` 재사용.
+
+A/B 선택은 구현 계획(writing-plans) 단계에서 그 시점의 wave2 상태 기준으로 확정.
+
 ## 11. Error Handling
 
 - **백엔드:** `GlobalExceptionHandler` 기존 패턴
-  - `IllegalArgumentException` (검증 실패) → `400 Bad Request` + 메시지
-  - `ForbiddenException` → `403`
-  - `NotFoundException` → `404`
+  - JSR-380 검증 실패 (`MethodArgumentNotValidException`) → `400` (기존 핸들러 재사용)
+  - 비즈니스 규칙 위반 (예: 범위 초과) → 새 `BadRequestException` 추가 권장 또는 기존 `ConflictException` 재사용 — 구현 시 결정. 선택지에 따라 `Exceptions.kt` + `GlobalExceptionHandler` 갱신
+  - `ForbiddenException` → `403` (기존)
+  - `NotFoundException` → `404` (기존)
 - **프론트:** TanStack Query `onError` → 토스트
   - 폼 모달은 에러 시 데이터 보존 + "재시도" 버튼
   - 시간 범위 검증 실패는 클라에서 폼 제출 전 1차 차단
@@ -352,7 +367,7 @@ frontend/src/
 
 ## 13. Migration & Rollout
 
-- Flyway V19로 테이블 추가, 기존 데이터 영향 없음
+- Flyway V14로 테이블 추가, 기존 데이터 영향 없음 (충돌 시 다음 비어있는 번호)
 - 기능 플래그 없이 직접 배포 — v1은 신규 페이지로 기존 흐름과 격리
 - nav 추가 항목: 모든 역할(HR/PM/Admin/Employee) 동일 노출
 
