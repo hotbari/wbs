@@ -56,6 +56,7 @@ export default function NavBar() {
             </Link>
             <div className="flex items-center gap-4">
               <NavLink href="/employees">직원</NavLink>
+              <NavLink href="/calendar">캘린더</NavLink>
               <NavLink href="/projects">프로젝트</NavLink>
               {isAdmin && (
                 <>

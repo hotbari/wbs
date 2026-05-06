@@ -24,6 +24,18 @@
   --info: #3b82f6;
   --info-light: #eff6ff;
 
+  /* Calendar event variants */
+  --event-private-bg: #fffbeb;
+  --event-private-border: #f59e0b;
+  --event-public-mine-bg: #fafafa;
+  --event-public-mine-border: #3f3f46;
+  --event-public-other-bg: #fafafa;
+  --event-public-other-border: #a1a1aa;
+
+  /* Calendar surfaces */
+  --calendar-today-tint: linear-gradient(180deg, rgba(16,185,129,0.06), transparent 70%);
+  --calendar-grid-line: var(--border);
+
   /* Shadows – diffusion style */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 3px 0 rgb(0 0 0 / 0.04);
   --shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.05), 0 4px 12px -2px rgb(0 0 0 / 0.08);
@@ -59,6 +71,12 @@
   --color-success-light: var(--success-light);
   --color-info: var(--info);
   --color-info-light: var(--info-light);
+  --color-event-private-bg: var(--event-private-bg);
+  --color-event-private-border: var(--event-private-border);
+  --color-event-public-mine-bg: var(--event-public-mine-bg);
+  --color-event-public-mine-border: var(--event-public-mine-border);
+  --color-event-public-other-bg: var(--event-public-other-bg);
+  --color-event-public-other-border: var(--event-public-other-border);
   --color-ring: var(--ring);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
