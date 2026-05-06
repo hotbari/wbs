@@ -1,6 +1,7 @@
 package com.company.workforce.config
 
 import com.company.workforce.security.JwtAuthenticationFilter
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,6 +32,9 @@ class SecurityConfig(
             it.requestMatchers("/api/auth/**").permitAll()
               .anyRequest().authenticated()
         }
+        .exceptionHandling { it.authenticationEntryPoint { _, response, _ ->
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+        }}
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
         .build()
 
